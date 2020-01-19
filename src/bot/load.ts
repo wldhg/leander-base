@@ -3,8 +3,7 @@
 
 import './types';
 
-import DISCORD from 'discord.js';
-
+import * as DISCORD from 'discord.js';
 // import * as character from './character';
 import * as commander from './commands';
 import * as moduler from './modules';
@@ -18,7 +17,7 @@ export const wakeUp = (core, lndrConf): void => {
 
   // Register exit callback
   core.onExit(() => {
-    if (lndr.cli) {
+    if (lndr.cli && lndr.cli.user) {
       presence.off(core, lndr);
     }
   });

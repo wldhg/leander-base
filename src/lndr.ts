@@ -13,13 +13,15 @@ core.init.then(() => {
     case 'bot': {
       // Leander bot
       import('./bot/load').then((bot) => {
+        let lndrConf;
         try {
-          return [bot, yml.safeLoad(
+          lndrConf = yml.safeLoad(
             fs.readFileSync(core.config.dir.data(['config.yml']), 'utf8'),
-          )];
+          );
         } catch (e) {
           core.err.parse('설정 파일을 불러올 수 없습니다.')(e);
         }
+        return [bot, lndrConf];
       }).then(([bot, lndrConf]) => {
         bot.wakeUp(core, lndrConf);
       });

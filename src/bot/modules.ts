@@ -1,8 +1,8 @@
 /* Leander is subject to the terms of the Mozilla Public License 2.0.
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
 
-import fs from 'fs';
-import path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const loadPartial = (core, lndr, target): Promise<LNDRModules> => {
   let modules: LNDRModules = {};
