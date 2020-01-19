@@ -1,0 +1,53 @@
+{
+  "name": "leander-base",
+  "version": "3.1.0",
+  "description": "디스코드 커뮤니티 서버용 봇 베이스",
+  "main": "./src/lndr.ts",
+  "repository": "https://github.com/wldh-g/leander-base.git",
+  "author": "Jio <jio@wldh.org>",
+  "license": "MPL-2.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=12.0.0",
+    "yarn": ">=1.1.0"
+  },
+  "babel": {
+    "plugins": [
+      "@babel/plugin-proposal-private-methods",
+      "@babel/plugin-proposal-class-properties",
+      "@babel/plugin-syntax-dynamic-import"
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.3",
+    "@babel/core": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@typescript-eslint/eslint-plugin": "^2.16.0",
+    "@typescript-eslint/parser": "^2.16.0",
+    "babel-loader": "^8.0.6",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.0",
+    "webpack": "^4.41.5"
+  },
+  "dependencies": {
+    "colors": "^1.4.0",
+    "discord.js": "^11.5.1",
+    "google-assistant": "^0.6.0",
+    "js-yaml": "^3.13.1",
+    "koa": "^2.11.0",
+    "koa-router": "^7.4.0",
+    "mime-types": "^2.1.26",
+    "moment": "^2.24.0",
+    "request": "^2.88.0",
+    "safe-eval": "^0.4.1",
+    "table": "^5.4.6",
+    "ts-node": "^8.6.2",
+    "typescript": "^3.7.5"
+  },
+  "scripts": {
+    "start": "ts-node ./src/lndr.ts",
+    "lint": "yarn eslint ./src/**/* --fix --parser babel-eslint"
+  }
+}
