@@ -5,14 +5,14 @@ const presenceList = [];
 let intervalNo;
 let cli;
 
-const changePresence = () => {
+const changePresence = (): void => {
   const presence = presenceList.shift();
   cli.user.setPresence(presence);
   presenceList.push(presence);
 };
 
-export const on = (core, lndr) => {
-  lndr.presence.list.forEach((item) => {
+export const on = (core: AppCore, lndr: LNDR): void => {
+  lndr.config.presence.list.forEach((item) => {
     if (typeof item === 'string') {
       presenceList.push({
         game: {
@@ -34,12 +34,14 @@ export const on = (core, lndr) => {
           break;
 
         default:
-          core.log.warn('알 수 없는 상태 객체입니다. 상태 객체는 다음 링크를 따라야 합니다: https://discord.js.org/#/docs/main/stable/typedef/PresenceData');
+          core.log.warn('알 수 없는 상태 객체입니다. 상태 객체는 PresenceData.Game 형식을 따라야 합니다.');
+          core.log.warn('PresenceData 형식: https://discord.js.org/#/docs/main/stable/typedef/PresenceData');
           core.log.debug(item);
           break;
       }
     } else {
-      core.log.warn(`알 수 없는 상태 형식입니다. 상태는 string 혹은 Game 객체 형식을 따라야 합니다: ${typeof item}`);
+      core.log.warn(`알 수 없는 상태 형식입니다. 상태는 string 혹은 PresenceData.Game 객체 형식을 따라야 합니다: ${typeof item}`);
+      core.log.warn('PresenceData 형식: https://discord.js.org/#/docs/main/stable/typedef/PresenceData');
       core.log.debug(item);
     }
   });
@@ -49,19 +51,23 @@ export const on = (core, lndr) => {
     presenceList.push({ status: 'online' });
   }
 
+  cli = lndr.cli;
+
   // Launch presence
   changePresence();
-  intervalNo = setInterval(changePresence, lndr.presence.interval * 1000);
+  intervalNo = setInterval(changePresence, lndr.config.presence.interval * 1000);
 };
 
-export const off = (core, lndr) => {
-  // Clear presence changements first
-  clearInterval(intervalNo);
+export const off = (core: AppCore, lndr: LNDR): void => {
+  if (lndr.cli && lndr.cli.user) {
+    // Clear presence changements first
+    clearInterval(intervalNo);
 
-  // Set offline
-  lndr.cli.user.setStatus('invisible');
-  lndr.cli.user.setPresence({ game: null, status: 'invisible' });
+    // Set offline
+    lndr.cli.user.setStatus('invisible');
+    lndr.cli.user.setPresence({ game: null, status: 'invisible' });
 
-  // Make log
-  core.log.info('상태 표시를 없앴고 오프라인으로 보이게 전환하였습니다.');
+    // Make log
+    core.log.info('상태 표시를 없앴고 오프라인으로 보이게 전환하였습니다.');
+  }
 };

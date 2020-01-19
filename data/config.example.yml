@@ -1,0 +1,19 @@
+discord:
+  token: # Bot Token
+  clientID: # Client ID
+  permission: '305655160' # Don't change this
+  adminID: # Administrator User ID
+  invitable: true # Invitable? true or false
+# domain:
+  # name: lndr.example.org
+  # port: 443
+  # tls:
+  #   key: tls/privkey.pem
+  #   cert: tls/fullchain.pem
+prefix: '?'
+presence:
+  interval: 60
+  list:
+    - Hello!
+    - Hello 2!
+character: default

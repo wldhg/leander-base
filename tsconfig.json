@@ -5,16 +5,13 @@
     "target": "esnext",
     "lib": [
       "esnext",
+      "dom",
     ],
     "allowJs": true,
     "baseUrl": "./src",
     "outDir": "./run",
     "allowSyntheticDefaultImports": true,
-    "keyofStringsOnly": false,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/core"
-    ]
+    "keyofStringsOnly": false
   },
   "include": [
     "./src/**/*",

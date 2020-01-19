@@ -1,6 +1,46 @@
 /* Leander is subject to the terms of the Mozilla Public License 2.0.
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+interface AppCore {
+  coreVersion: string;
+  log: AppLogFunction & {
+    info: AppLogFunction;
+    error: AppLogFunction;
+    debug: AppLogAnyFunction;
+    warn: AppLogFunction;
+    okay: AppLogFunction;
+    i: number;
+  };
+  exit: (exitCode?: number) => Promise<void>;
+  onExit: (fn: () => void) => void;
+  arg: AppArgAnalyzed;
+  config: AppConfig;
+  err: {
+    make: (msg: any, addi?: any) => Error;
+    parse: (desc: any, exitCode?: number) => (e: Error) => Promise<void>;
+  };
+  util: {
+    format: AppFunction;
+    json: AppFunctions;
+    mkdir: AppFunction;
+    ordinalSuffix: AppFunction;
+    random: AppFunction;
+  };
+  init: Promise<any>;
+}
+
+type AppFunction = (...args: any[]) => any;
+type AppFunctions = {
+  [key: string]: {
+    [key: string]: AppFunction;
+  };
+};
+
+type AppLogFunction = (data: string, title?: string) => void;
+type AppLogAnyFunction = (data: any, title?: string) => void;
+
 type AppDirMaker = (structuredPath: string[]) => string
 interface AppDir {
   DATA: string;

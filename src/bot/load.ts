@@ -4,15 +4,22 @@
 import './types';
 
 import * as DISCORD from 'discord.js';
-// import * as character from './character';
 import * as commander from './commands';
+import { checkPerm, MessageType } from './message';
 import * as moduler from './modules';
 import * as presence from './presence';
+import * as translate from './translate';
 
 export const wakeUp = (core, lndrConf): void => {
   const lndr: LNDR = {
     config: lndrConf,
     cli: new DISCORD.Client(),
+    dummy: '\u200B',
+    t: translate.getT(core, lndrConf),
+    fn: {},
+    help: {},
+    meta: {},
+    hooks: {},
   };
 
   // Register exit callback
@@ -22,208 +29,231 @@ export const wakeUp = (core, lndrConf): void => {
     }
   });
 
-  // Initialize leander modules
+  // Read leander modules
   moduler.load(core, lndr)
-  // Initialize leander commands
+  // Initialize leander modules, read leander commands
     .then((loadedModules) => {
-      lndr.modules = loadedModules;
-      lndr.m = loadedModules;
-      //return command.load(core, lndr);
-    })
-  // Create required embeds, links
-    //.then(([loadedCommands, loadedActions]) => {
-      //lndr.commands = loadedCommands;
-    //});
-  // Turn on DISCORD, start processing messages
-
-  // Initialize leander commands
-  /*
-  Promise.all([
-    lndr = etc.init(kernel, lndr);
-    lndr = web.init(kernel, lndr);
-    lndr = dialog.init(kernel, lndr);
-    lndr = embed.init(kernel, lndr);
-    lndr = assistant.init(kernel, lndr);
-    lndr = blhx.init(kernel, lndr);
-    lndr = guild.init(kernel, lndr);
-  ])
-
-  // Load all features and prepare them
-  const commandMap = {};
-  const helpEmbedSource = {};
-  let helpEmbed;
-  module.load(kernel, lndr, './bot/commands')
-    .then(([loadedCommands, loadedActions]) => {
-      let realModuleCount = 0;
-      kernel.log(`bot::wakeUp - ${loadedCommands.length} available modules found.`);
-
-      // Prepare {helpEmbedSource}
-      module.sectionList.forEach((sectionName) => {
-        helpEmbedSource[sectionName] = [];
-      });
-
-      // Process raw command objects
-      loadedCommands.forEach((cmd) => {
-        if (cmd.main) {
-          realModuleCount += 1;
-
-          // Mapping commands
-          if (cmd.commands) {
-            for (let i = 0; i < cmd.commands.length; i += 1) {
-              // Add to help source
-              if (i === 0) {
-                if (cmd.section === null) {
-                  kernel.log(
-                    `bot::wakeUp - A command will not be shown in help (null) : ${cmd.moduleID}`,
-                  );
-                } else if (module.sectionList.includes(cmd.section)) {
-                  helpEmbedSource[cmd.section].push(cmd.commands[0]);
-                } else {
-                  kernel.log(
-                    `bot::wakeUp - A command will not be shown in help (invalid section) : ${cmd.moduleID}`,
-                  );
-                }
-              }
-
-              // Add to command map
-              commandMap[cmd.commands[i]] = cmd;
+      loadedModules.forEach((aModule) => {
+        lndr[aModule.name] = aModule.acts;
+        if (aModule.hooks) {
+          aModule.hooks.forEach((hook) => {
+            if (!lndr.hooks[hook.on]) {
+              lndr.hooks[hook.on] = [hook];
+            } else {
+              lndr.hooks[hook.on].push(hook);
             }
-          }
+          });
         }
       });
-
-      lndr.acts = loadedActions;
-      lndr.commands = commandMap;
-      kernel.log(`bot::wakeUp - ${realModuleCount} modules are successfully mapped.`);
+      lndr.modules = loadedModules;
+      core.log.info(`${Object.keys(loadedModules).length} 개의 모듈이 로드되었습니다.`);
+      return commander.load(core, lndr);
     })
-    .then(() => {
-      // Create help embed
-      helpEmbed = lndr.createEmbed('<:lndrcircle:590238436758257719>  명령어 목록', '리엔더에게 아래의 명령어를 사용할 수 있어요.', 0xffe2ec);
-      Object.keys(helpEmbedSource).forEach((key) => {
-        helpEmbed.addField(`${lndr.dummyLine}${lndr.dummyLine}${key}`, `\`${helpEmbedSource[key].join('`, `')}\``);
-      });
-      helpEmbed.addField(lndr.dummyChar, `\`${lndr.prefix.general}도움말 [명령어]\`를 입력해서 각 명령어에 대한 도움말을 보실 수 있어요.`);
-      helpEmbed.setFooter('지휘관님, 가끔은 제게 의지하셔도 괜찮다구요?');
-      lndr.helpEmbed = helpEmbed;
-    })
-    .then(() => {
-      // Make all actions recursive
-      const actionGroups = Object.keys(lndr.acts);
-      actionGroups.forEach((outerGroup) => {
-        actionGroups.forEach((innerGroup) => {
-          if (outerGroup !== innerGroup && !lndr.acts[outerGroup][innerGroup]) {
-            lndr.acts[outerGroup][innerGroup] = lndr.acts[innerGroup];
+  // Initialize leander commands with compose help structure
+    .then((loadedCommands: LNDRCommand[]) => {
+      const helpStructure = {};
+      loadedCommands.forEach((aCommand) => {
+        if (aCommand.meta.commands.length > 0) {
+          if (aCommand.meta.section.length > 0) {
+            if (!helpStructure[aCommand.meta.section]) {
+              helpStructure[aCommand.meta.section] = [];
+            }
+            helpStructure[aCommand.meta.section].push(aCommand.meta.commands[0]);
+          } else {
+            core.log.warn(`명령어 모음에 표시되지 않는 명령어가 있습니다: ${aCommand.meta.commands.join(', ')}`);
           }
+        } else {
+          core.log.warn(`접근할 수 없는 명령어가 있습니다: ${aCommand.help.title}`);
+        }
+        aCommand.meta.commands.forEach((cmd) => {
+          lndr.fn[cmd] = aCommand.fn;
+          lndr.help[cmd] = aCommand.help;
+          lndr.meta[cmd] = aCommand.meta;
         });
       });
+      lndr.commands = loadedCommands;
+      core.log.info(`${loadedCommands.length} 개의 명령어가 로드되었습니다.`);
+      core.log.info(`${Object.keys(lndr.fn).length} 개의 명령어 키워드가 등록되었습니다.`);
+      return helpStructure;
     })
-    .then(() => {
-      kernel.log('bot::wakeUp - Trying to log in...');
-
-      // Turn on DISCORD
-      lndr.cli.login(lndr.discord.token);
-      lndr.cli.on('ready', () => {
-        presence.on(kernel, lndr);
-        kernel.log.okay(`bot::wakeUp - Successfully logged in: ${lndr.cli.user.tag}`);
+  // Create help embed
+    .then((helpStructure) => {
+      lndr.helpEmbed = lndr.embed.create(lndr.t('bot.help.h1'), `${lndr.t('bot.help.h2')}\n${lndr.dummy}`, 0xffe2ec);
+      Object.keys(helpStructure).forEach((key) => {
+        lndr.helpEmbed.addField(key, `\`${helpStructure[key].join('`, `')}\`\n${lndr.dummy}`);
       });
-
-      // Process messages
+      lndr.helpEmbed.addField(lndr.dummy, lndr.t('bot.help.footer', lndr.config.prefix));
+      lndr.helpEmbed.setFooter(lndr.t('bot.help.message'));
+    })
+  // Turn on DISCORD, start processing messages
+    .then(() => {
+      lndr.cli.login(lndr.config.discord.token);
+      lndr.cli.on('ready', () => {
+        presence.on(core, lndr);
+        core.log.okay(`디스코드 봇 계정으로 로그인하였습니다: ${lndr.cli.user.tag}`);
+        core.log.info('지금부터 메시지를 처리하기 시작합니다.');
+      });
       lndr.cli.on('message', (msg) => {
         try {
-          if (msg.type !== 'DEFAULT') {
-            //
-          } else {
-            // Default type message
-            const msgContext = dialog.getContext(msg);
-            if (msgContext) {
-              // If in conversation, go to that conversation context
-              dialog.continueConversation(msg, msgContext);
-            } else if (msg.content.indexOf(lndr.prefix.assistant) === 0) {
-              // Google Assistant part
-              const pmsg = etc.parseMessageText(lndr.prefix.assistant, msg.content);
-              if (!pmsg.serial && pmsg.rawContent.length > 0) {
-                // Do assist
-                assistant.addToWaitList(msg.channel, pmsg.rawContent);
-              }
-            } else if (msg.content.indexOf(lndr.prefix.general) === 0) {
-              // Leander command part
-              const pmsg = etc.parseMessageText(lndr.prefix.general, msg.content);
-              pmsg.raw = msg;
-              pmsg.send = (data) => msg.channel.send(data);
-              pmsg.channel = msg.channel;
-              pmsg.author = msg.author;
-              pmsg.guild = msg.guild;
-              pmsg.member = msg.member;
-
-              if (pmsg.serial && commandMap[pmsg.command]) {
-                const cmd = commandMap[pmsg.command];
-
-                // Check admin conditions
-                if (cmd.conditions.lndrAdmin && msg.author.id !== lndr.discord.adminID) {
-                  return;
-                }
-                if (
-                  cmd.conditions.serverAdmin
-                  && msg.member
-                  && !msg.member.hasPermission('ADMINISTRATOR')
-                ) {
-                  return;
-                }
-
-                // Check author condition
-                if (cmd.conditions.author && cmd.conditions.author.length > 0) {
-                  let partialPermissionEngagement = false;
-
-                  cmd.conditions.author.forEach((author) => {
-                    if (msg.author.id === author.toString()) {
-                      partialPermissionEngagement = true;
-                    }
-                  });
-
-                  if (!partialPermissionEngagement) {
+          switch (msg.type) {
+            case 'RECIPIENT_ADD': {
+              if (lndr.hooks[MessageType.RECIPIENT_ADD]) {
+                const hooks = lndr.hooks[MessageType.RECIPIENT_ADD];
+                for (let i = 0; i < hooks.length; i += 1) {
+                  if (hooks[i].checker(msg)) {
+                    hooks[i].fn(msg);
                     return;
                   }
                 }
+              }
+              break;
+            }
 
-                // Check channel condition
-                if (cmd.conditions.channel && cmd.conditions.channel.length > 0) {
-                  let partialPermissionEngagement = false;
-
-                  cmd.conditions.channel.forEach((channel) => {
-                    if (msg.channel.id === channel.toString()) {
-                      partialPermissionEngagement = true;
-                    }
-                  });
-
-                  if (!partialPermissionEngagement) {
+            case 'RECIPIENT_REMOVE': {
+              if (lndr.hooks[MessageType.RECIPIENT_REMOVE]) {
+                const hooks = lndr.hooks[MessageType.RECIPIENT_REMOVE];
+                for (let i = 0; i < hooks.length; i += 1) {
+                  if (hooks[i].checker(msg)) {
+                    hooks[i].fn(msg);
                     return;
                   }
                 }
-
-                // Check DM condition
-                if (
-                  cmd.conditions.DM === false
-                  && msg.channel instanceof DISCORD.DMChannel
-                ) {
-                  return;
-                }
-                if (
-                  cmd.conditions.DM === true
-                  && !(msg.channel instanceof DISCORD.DMChannel)
-                ) {
-                  return;
-                }
-
-                // If required process it
-                const tempLndr = Object.assign({}, lndr);
-                tempLndr.acts = lndr.acts[cmd.moduleID];
-                cmd.main(kernel, tempLndr, pmsg);
               }
+              break;
+            }
+
+            case 'CALL': {
+              if (lndr.hooks[MessageType.CALL]) {
+                const hooks = lndr.hooks[MessageType.CALL];
+                for (let i = 0; i < hooks.length; i += 1) {
+                  if (hooks[i].checker(msg)) {
+                    hooks[i].fn(msg);
+                    return;
+                  }
+                }
+              }
+              break;
+            }
+
+            case 'CHANNEL_NAME_CHANGE': {
+              if (lndr.hooks[MessageType.CHANNEL_NAME_CHANGE]) {
+                const hooks = lndr.hooks[MessageType.CHANNEL_NAME_CHANGE];
+                for (let i = 0; i < hooks.length; i += 1) {
+                  if (hooks[i].checker(msg)) {
+                    hooks[i].fn(msg);
+                    return;
+                  }
+                }
+              }
+              break;
+            }
+
+            case 'CHANNEL_ICON_CHANGE': {
+              if (lndr.hooks[MessageType.CHANNEL_ICON_CHANGE]) {
+                const hooks = lndr.hooks[MessageType.CHANNEL_ICON_CHANGE];
+                for (let i = 0; i < hooks.length; i += 1) {
+                  if (hooks[i].checker(msg)) {
+                    hooks[i].fn(msg);
+                    return;
+                  }
+                }
+              }
+              break;
+            }
+
+            case 'PINS_ADD': {
+              if (lndr.hooks[MessageType.PINS_ADD]) {
+                const hooks = lndr.hooks[MessageType.PINS_ADD];
+                for (let i = 0; i < hooks.length; i += 1) {
+                  if (hooks[i].checker(msg)) {
+                    hooks[i].fn(msg);
+                    return;
+                  }
+                }
+              }
+              break;
+            }
+
+            case 'GUILD_MEMBER_JOIN': {
+              if (lndr.hooks[MessageType.GUILD_MEMBER_JOIN]) {
+                const hooks = lndr.hooks[MessageType.GUILD_MEMBER_JOIN];
+                for (let i = 0; i < hooks.length; i += 1) {
+                  if (hooks[i].checker(msg)) {
+                    hooks[i].fn(msg);
+                    return;
+                  }
+                }
+              }
+              break;
+            }
+
+            case 'DEFAULT': {
+              if (lndr.hooks[MessageType.DEFAULT]) {
+                const hooks = lndr.hooks[MessageType.DEFAULT];
+                for (let i = 0; i < hooks.length; i += 1) {
+                  if (hooks[i].checker(msg)) {
+                    hooks[i].fn(msg);
+                    return;
+                  }
+                }
+              }
+              if (msg.content.indexOf(lndr.config.prefix) === 0) {
+                // Leander command part
+                const pmsg = lndr.tools.parseMessageText(lndr.config.prefix, msg.content);
+                pmsg.raw = msg;
+                pmsg.send = (data): Promise<DISCORD.Message | DISCORD.Message[]> => msg.channel
+                  .send(data);
+                pmsg.channel = msg.channel;
+                pmsg.author = msg.author;
+                pmsg.guild = msg.guild;
+                pmsg.member = msg.member;
+
+                if (pmsg.serial && lndr.fn[pmsg.command]) {
+                  const fn = lndr.fn[pmsg.command];
+                  const meta = lndr.meta[pmsg.command];
+
+                  // Check admin conditions
+                  if (
+                    (meta.conditions.lndrAdmin && msg.author.id !== lndr.config.discord.adminID)
+                    || (meta.conditions.guildAdmin && msg.member && !msg.member.hasPermission('ADMINISTRATOR'))
+                  ) return;
+
+                  // Check author condition
+                  if (meta.conditions.author && meta.conditions.author.length > 0) {
+                    if (!checkPerm(meta.conditions.author, msg.author.id)) return;
+                  }
+
+                  // Check channel condition
+                  if (meta.conditions.channel && meta.conditions.channel.length > 0) {
+                    if (!checkPerm(meta.conditions.channel, msg.channel.id)) return;
+                  }
+
+                  // Check guild condition
+                  if (msg.guild && meta.conditions.guild && meta.conditions.guild.length > 0) {
+                    if (!checkPerm(meta.conditions.guild, msg.guild.id)) return;
+                  }
+
+                  // Check DM condition
+                  if (
+                    (meta.conditions.DM === false && msg.channel instanceof DISCORD.DMChannel)
+                    || (meta.conditions.DM === true && !(msg.channel instanceof DISCORD.DMChannel))
+                  ) return;
+
+                  // Process command
+                  const tempLndr = { ...lndr };
+                  fn(core, tempLndr, pmsg);
+                }
+              }
+              break;
+            }
+
+            default: {
+              throw new Error(`예상하지 못한 메시지 종류입니다: ${msg.type}`);
             }
           }
         } catch (cmdErr) {
-          kernel.err.parse(`bot::onMessage - "${msg.content}"`)(cmdErr);
-          kernel.log.debug({
+          core.err.parse(`메시지 처리에 오류가 발생했습니다: "${msg.content}"`, 'silent')(cmdErr);
+          core.log.debug({
             content: msg.content,
             channelID: msg.channel.id,
             authorID: msg.author.id,
@@ -232,5 +262,5 @@ export const wakeUp = (core, lndrConf): void => {
           msg.channel.stopTyping(true);
         }
       });
-    }); */
+    });
 };

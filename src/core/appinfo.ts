@@ -14,7 +14,7 @@ export const name: AppName = {
 // [Directories]
 export const dir: AppDir = {
   data: (p) => path.join(process.cwd(), 'data', ...p),
-  res: (p) => path.join(process.cwd(), 'resources', ...p),
+  res: (p) => path.join(process.cwd(), 'res', ...p),
   DATA: path.join(process.cwd(), 'data'),
   RES: path.join(process.cwd(), 'res'),
 };

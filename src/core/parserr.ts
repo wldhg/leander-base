@@ -67,6 +67,7 @@ export const parse = (description, exitCode = 0): ((e: Error) => Promise<void | 
 
     let returnPromise;
     if (typeof exitCode === 'number') returnPromise = exit.code(exitCode);
+    else if (typeof exitCode === 'string' && exitCode === 'silent') returnPromise = true;
 
     return returnPromise || Promise.reject(e);
   };

@@ -4,52 +4,49 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const sectionList = ['벽람항로', '함대 커뮤니티', '이벤트', '기타'];
-
-export const load = (kernel, lndr, target) => {
-  let rawCommands = [];
-  let acts = {};
+const loadPartial = (core, lndr, target): Promise<LNDRCommand[]> => {
+  let commands: LNDRCommand[] = [];
   return new Promise((resolve) => {
     fs.promises.readdir(target).then((list) => {
-      // Load all file (modules)
+      // Load all file (commands)
       const processList = [];
       list.forEach((item) => {
-        processList.push(new Promise((resolveModule) => {
+        processList.push(new Promise((resolveCmd) => {
           const fullPath = path.join(target, item);
           const lstat = fs.lstatSync(fullPath);
           if (lstat.isDirectory()) {
-            load(kernel, lndr, fullPath).then(([loadedRawCommands, loadedActs]) => {
-              rawCommands = rawCommands.concat(loadedRawCommands);
-              acts = Object.assign(acts, loadedActs);
-              resolveModule();
+            loadPartial(core, lndr, fullPath).then((loadedCommands) => {
+              commands = commands.concat(loadedCommands);
+              resolveCmd();
             });
           } else if (lstat.isFile()) {
             const targetPath = path.normalize(`../../${fullPath}`).replace(/\\/g, '/');
-            import(targetPath).then((rawCommand) => {
-              if (rawCommand && rawCommand.main) {
-                rawCommand.meta.commands.push(rawCommand.meta.moduleID);
-                rawCommands.push(Object.assign(rawCommand.meta, { main: rawCommand.main }));
-                acts[rawCommand.meta.moduleID] = rawCommand.actions(kernel, lndr);
+            import(targetPath).then((loadedCommand) => {
+              if (loadedCommand && loadedCommand.meta && loadedCommand.fn
+                && loadedCommand.help && loadedCommand.help.title) {
+                commands.push(loadedCommand);
               } else {
-                kernel.log.warn(`This file is ignored because it's not Leander module: ${fullPath}`);
+                core.log.warn(`이 파일은 올바른 명령어 정의가 아닙니다. 무시하고 계속합니다: ${fullPath}`);
               }
-              resolveModule();
+              resolveCmd();
             }).catch((error) => {
-              kernel.err.parse(`Failed to read a command module: ${item}`)(error);
-              kernel.log.warn(`This file is ignored: ${fullPath}`);
-              resolveModule();
+              core.err.parse(`명령어를 읽을 수 없습니다: ${item}`, 'silent')(error);
+              core.log.warn(`파일을 무시하고 계속합니다: ${fullPath}`);
+              resolveCmd();
             });
           } else {
-            kernel.log.warn(`${fullPath} is not file or directory. Ignored.`);
+            core.log.warn(`${fullPath} 은 파일 혹은 디렉토리가 아닙니다. 무시하고 계속합니다.`);
           }
         }));
       });
       Promise.all(processList).then(() => {
-        resolve([rawCommands, acts]);
+        resolve(commands);
       });
     }, (dirReadErr) => {
-      kernel.err.parse('Failed to read directory.')(dirReadErr);
-      resolve([rawCommands, acts]);
+      core.err.parse('명령어 디렉토리를 읽을 수 없습니다. 디렉토리를 무시합니다.', 'silent')(dirReadErr);
+      resolve(commands);
     });
   });
 };
+
+export const load = (core, lndr): Promise<LNDRCommand[]> => loadPartial(core, lndr, './src/bot/commands');

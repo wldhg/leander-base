@@ -3,9 +3,11 @@
 
 // Translate some parameters in form of '[[(_|0-9|a-Z)]]' in string
 
-interface FormatDict {
+type FormatDictObject = {
   [key: string]: string;
 }
+type FormatDictArray = string[];
+type FormatDict = FormatDictObject | FormatDictArray;
 
 /**
  * Formatter utility.
