@@ -31,3 +31,12 @@ interface LNDR {
   m?: LNDRModules;
   commands?: LNDRCommand[];
 }
+
+type LNDRModule = object;
+interface LNDRModules {
+  [key: string]: LNDRModule;
+}
+
+interface LNDRCommand {
+  i: string;
+}

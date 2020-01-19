@@ -4,8 +4,8 @@
 // JSON management module
 
 /* eslint-disable import/extensions */
-import util from 'util';
-import fs from 'fs';
+import * as util from 'util';
+import * as fs from 'fs';
 import mkdir from './mkdir';
 
 const readFile = util.promisify(fs.readFile);

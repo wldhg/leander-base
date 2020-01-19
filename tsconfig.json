@@ -1,16 +1,20 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "esnext",
+    "module": "commonjs",
     "target": "esnext",
     "lib": [
       "esnext",
     ],
     "allowJs": true,
-    "baseUrl": ".",
-    "outDir": "run",
+    "baseUrl": "./src",
+    "outDir": "./run",
     "allowSyntheticDefaultImports": true,
-    "keyofStringsOnly": true,
+    "keyofStringsOnly": false,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/core"
+    ]
   },
   "include": [
     "./src/**/*",

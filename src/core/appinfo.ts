@@ -3,7 +3,7 @@
 
 // Program Constants
 
-import path from 'path';
+import * as path from 'path';
 
 // [Strings]
 export const name: AppName = {

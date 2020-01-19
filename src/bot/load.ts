@@ -1,11 +1,13 @@
 /* Leander is subject to the terms of the Mozilla Public License 2.0.
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
 
+import './types';
+
 import DISCORD from 'discord.js';
 
 // import * as character from './character';
-import * as command from './commands';
-import * as module from './modules';
+import * as commander from './commands';
+import * as moduler from './modules';
 import * as presence from './presence';
 
 export const wakeUp = (core, lndrConf): void => {
@@ -22,7 +24,7 @@ export const wakeUp = (core, lndrConf): void => {
   });
 
   // Initialize leander modules
-  module.load(core, lndr)
+  moduler.load(core, lndr)
   // Initialize leander commands
     .then((loadedModules) => {
       lndr.modules = loadedModules;

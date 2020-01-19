@@ -3,6 +3,10 @@
 
 // Translate some parameters in form of '[[(_|0-9|a-Z)]]' in string
 
+interface FormatDict {
+  [key: string]: string;
+}
+
 /**
  * Formatter utility.
  */

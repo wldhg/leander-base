@@ -3,8 +3,8 @@
 
 // Do mkdir of specified path
 
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 
 const isCharSep = (char): boolean => char === '/' || char === '\\';
 

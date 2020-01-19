@@ -38,7 +38,7 @@ export const parse = (description, exitCode = 0): ((e: Error) => Promise<void | 
     log.error(description);
 
     if (!e) {
-      log.warn('오류가 전달되었으나 내용이 없습니다.');
+      log.warn('오류가 전달되었으나 상세 내용은 없습니다.');
     } else if ((e.message || e.msg) && e.name === '_parserr') {
       log.debug(`${e.message || e.msg}`);
 

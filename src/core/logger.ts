@@ -3,11 +3,11 @@
 
 // Logging module
 
-import fs, { WriteStream } from 'fs';
-import path from 'path';
-import util from 'util';
-import moment from 'moment';
-import colors from 'colors';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as util from 'util';
+import * as moment from 'moment';
+import * as colors from 'colors';
 import mkdir from '../util/mkdir';
 
 /**
@@ -22,7 +22,7 @@ class Logger {
     }
   }
 
-  private fstream: WriteStream;
+  private fstream: fs.WriteStream;
 
   private logDirBase: string;
 
@@ -145,7 +145,7 @@ class Logger {
     });
   }
 
-  get fsout(): WriteStream { return this.fstream; }
+  get fsout(): fs.WriteStream { return this.fstream; }
 
   fsw(data): void { if (this.fsout) this.fsout.write(data); }
 

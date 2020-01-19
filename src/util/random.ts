@@ -4,7 +4,7 @@
 // Generates cryptographically-safe random number
 // Algorithm & base code by https://stackoverflow.com/a/33627342/9471289
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 
 /**
  * Creates a random number.

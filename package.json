@@ -7,9 +7,8 @@
   "author": "Jio <jio@wldh.org>",
   "license": "MPL-2.0",
   "private": true,
-  "type": "module",
   "engines": {
-    "node": ">=12.0.0",
+    "node": ">=12.0.0 <13.0.0",
     "yarn": ">=1.1.0"
   },
   "babel": {
@@ -44,10 +43,11 @@
     "request": "^2.88.0",
     "safe-eval": "^0.4.1",
     "table": "^5.4.6",
+    "ts-node": "^8.6.2",
     "typescript": "^3.7.5"
   },
   "scripts": {
-    "start": "node ./run/lndr.js",
+    "start": "ts-node ./src/lndr.ts",
     "build": "tsc",
     "lint": "yarn eslint ./src/**/* --fix --parser babel-eslint",
     "docs": "cd docs && bundle exec jekyll serve"
