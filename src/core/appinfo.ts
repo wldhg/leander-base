@@ -1,12 +1,13 @@
 /* Leander is subject to the terms of the Mozilla Public License 2.0.
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
+
 // Program Constants
 
 import path from 'path';
 
 // [Strings]
 export const name: AppName = {
-  full: 'Leander',
+  full: '리엔더',
   abbr: 'lndr',
 };
 
@@ -23,7 +24,7 @@ export const arg: AppArg = {
   fn: {
     default: {
       keyword: 'bot',
-      description: 'Starts leander bot.',
+      description: '리엔더 봇을 시작합니다.',
       options: [],
     },
   },

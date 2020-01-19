@@ -1,3 +1,6 @@
+/* Leander is subject to the terms of the Mozilla Public License 2.0.
+ * You can obtain a copy of MPL at LICENSE.md of repository root. */
+
 const presenceList = [];
 let intervalNo;
 let cli;
@@ -8,10 +11,7 @@ const changePresence = () => {
   presenceList.push(presence);
 };
 
-export const on = (kernel, lndr) => {
-  // eslint-disable-next-line prefer-destructuring
-  cli = lndr.cli;
-
+export const on = (core, lndr) => {
   lndr.presence.list.forEach((item) => {
     if (typeof item === 'string') {
       presenceList.push({
@@ -22,27 +22,30 @@ export const on = (kernel, lndr) => {
         status: 'online',
       });
     } else if (typeof item === 'object') {
-      if (item.message && item.url) {
-        presenceList.push({
-          game: {
-            name: item.message,
-            url: item.url,
-            type: 'STREAMING',
-          },
-          status: 'online',
-        });
-      } else {
-        kernel.log.warn('Unknown presence object detected.');
-        kernel.log.debug(item);
+      switch (item.type) {
+        case 'WATCHING':
+        case 'PLAYING':
+        case 'STREAMING':
+        case 'LISTENING':
+          presenceList.push({
+            game: item,
+            status: 'online',
+          });
+          break;
+
+        default:
+          core.log.warn('알 수 없는 상태 객체입니다. 상태 객체는 다음 링크를 따라야 합니다: https://discord.js.org/#/docs/main/stable/typedef/PresenceData');
+          core.log.debug(item);
+          break;
       }
     } else {
-      kernel.log.warn(`Unknown presence type detected: ${typeof item}`);
-      kernel.log.debug(item);
+      core.log.warn(`알 수 없는 상태 형식입니다. 상태는 string 혹은 Game 객체 형식을 따라야 합니다: ${typeof item}`);
+      core.log.debug(item);
     }
   });
 
   if (presenceList.length < 1) {
-    kernel.log.info('No presence set. Only online sign will be displayed.');
+    core.log.info('상태가 설정되지 않았습니다. 온라인이라는 정보만이 표시됩니다.');
     presenceList.push({ status: 'online' });
   }
 
@@ -51,7 +54,7 @@ export const on = (kernel, lndr) => {
   intervalNo = setInterval(changePresence, lndr.presence.interval * 1000);
 };
 
-export const off = (kernel, lndr) => {
+export const off = (core, lndr) => {
   // Clear presence changements first
   clearInterval(intervalNo);
 
@@ -60,5 +63,5 @@ export const off = (kernel, lndr) => {
   lndr.cli.user.setPresence({ game: null, status: 'invisible' });
 
   // Make log
-  kernel.log.info('Interval cleared and changed to offline.');
+  core.log.info('상태 표시를 없앴고 오프라인으로 보이게 전환하였습니다.');
 };

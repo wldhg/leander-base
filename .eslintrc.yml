@@ -4,6 +4,7 @@ env:
 extends:
   - airbnb-base
   - "plugin:@typescript-eslint/eslint-recommended"
+  - "plugin:@typescript-eslint/recommended"
 plugins:
   - "@typescript-eslint"
 globals:
@@ -13,7 +14,11 @@ parser: "@typescript-eslint/parser"
 rules:
   generator-star-spacing: off
   no-debugger: off
+  no-unused-vars: off
   import/extensions: off
+  import/prefer-default-export: off
+  "@typescript-eslint/no-empty-function": off
+  "@typescript-eslint/no-this-alias": off
 settings:
   import/resolver:
     node:

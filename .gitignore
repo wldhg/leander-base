@@ -60,3 +60,8 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# No output
+src/**/*.js
+run/
+run/*

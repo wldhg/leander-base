@@ -2,7 +2,7 @@
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
 
 // Package.json data types by https://gist.github.com/iainreid820/5c1cc527fe6b5b7dba41fec7fe54bf6e
-interface IPackageJSON extends Object {
+interface PackageJSON extends Object {
 
   readonly name?: string;
 
@@ -14,41 +14,41 @@ interface IPackageJSON extends Object {
 
   readonly homepage?: string;
 
-  readonly bugs?: string|IBugs;
+  readonly bugs?: string|Bugs;
 
   readonly license?: string;
 
-  readonly author?: string|IAuthor;
+  readonly author?: string|Author;
 
-  readonly contributors?: string[]|IAuthor[];
+  readonly contributors?: string[]|Author[];
 
   readonly files?: string[];
 
   readonly main?: string;
 
-  readonly bin?: string|IBinMap;
+  readonly bin?: string|BinMap;
 
   readonly man?: string|string[];
 
-  readonly directories?: IDirectories;
+  readonly directories?: Directories;
 
-  readonly repository?: string|IRepository;
+  readonly repository?: string|Repository;
 
-  readonly scripts?: IScriptsMap;
+  readonly scripts?: ScriptsMap;
 
-  readonly config?: IConfig;
+  readonly config?: Config;
 
-  readonly dependencies?: IDependencyMap;
+  readonly dependencies?: DependencyMap;
 
-  readonly devDependencies?: IDependencyMap;
+  readonly devDependencies?: DependencyMap;
 
-  readonly peerDependencies?: IDependencyMap;
+  readonly peerDependencies?: DependencyMap;
 
-  readonly optionalDependencies?: IDependencyMap;
+  readonly optionalDependencies?: DependencyMap;
 
   readonly bundledDependencies?: string[];
 
-  readonly engines?: IEngines;
+  readonly engines?: Engines;
 
   readonly os?: string[];
 
@@ -58,14 +58,14 @@ interface IPackageJSON extends Object {
 
   readonly private?: boolean;
 
-  readonly publishConfig?: IPublishConfig;
+  readonly publishConfig?: PublishConfig;
 
 }
 
 /**
  * An author or contributor
  */
-interface IAuthor {
+interface Author {
   name: string;
   email?: string;
   homepage?: string;
@@ -74,34 +74,34 @@ interface IAuthor {
 /**
  * A map of exposed bin commands
  */
-interface IBinMap {
+interface BinMap {
   [commandName: string]: string;
 }
 
 /**
  * A bugs link
  */
-interface IBugs {
+interface Bugs {
   email: string;
   url: string;
 }
 
-interface IConfig {
+interface Config {
   name?: string;
-  config?: Object;
+  config?: object;
 }
 
 /**
  * A map of dependencies
  */
-interface IDependencyMap {
+interface DependencyMap {
   [dependencyName: string]: string;
 }
 
 /**
  * CommonJS package structure
  */
-interface IDirectories {
+interface Directories {
   lib?: string;
   bin?: string;
   man?: string;
@@ -109,29 +109,29 @@ interface IDirectories {
   example?: string;
 }
 
-interface IEngines {
+interface Engines {
   node?: string;
   npm?: string;
 }
 
-interface IPublishConfig {
+interface PublishConfig {
   registry?: string;
 }
 
 /**
  * A project repository
  */
-interface IRepository {
+interface Repository {
   type: string;
   url: string;
 }
 
-interface IScriptsMap {
+interface ScriptsMap {
   [scriptName: string]: string;
 }
 
-type AppConfig = IPackageJSON & {
-  name?: AppName
-  dir?: AppDir
-  arg?: AppArg
+type AppConfig = PackageJSON & {
+  name?: AppName;
+  dir?: AppDir;
+  arg?: AppArg;
 }

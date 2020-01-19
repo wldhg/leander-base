@@ -1,19 +1,18 @@
 /* Leander is subject to the terms of the Mozilla Public License 2.0.
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
+
 // Do mkdir of specified path
 
 import path from 'path';
 import fs from 'fs';
 
-const isCharSep = (char) => char === '/' || char === '\\';
+const isCharSep = (char): boolean => char === '/' || char === '\\';
 
 /**
  * Creates directories upon {basePath}.
  * If {newDirPath} is empty, just create {baseDirPath}.
- * @param {String} basePath
- * @param {?String} newPath
  */
-export default (basePath, newPath = '') => {
+export default (basePath, newPath = ''): Promise<string> => {
   /* Regulate Variables */
   let baseDir = `${basePath}`;
   let newDir = `${newPath}`;

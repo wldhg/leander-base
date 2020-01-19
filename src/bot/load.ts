@@ -1,66 +1,51 @@
+/* Leander is subject to the terms of the Mozilla Public License 2.0.
+ * You can obtain a copy of MPL at LICENSE.md of repository root. */
+
 import DISCORD from 'discord.js';
-import * as assistant from './core/assistant.js';
-import * as blhx from './core/blhx.js';
-import * as dialog from './core/dialogue.js';
-import * as embed from './core/embed.js';
-import * as etc from './core/etc.js';
-import * as guild from './core/guild.js';
-import * as module from './core/module.js';
-import * as presence from './presence.js';
-import * as web from './core/web.js';
 
-/**
- * Leander object.
- * @type {object}
- *
- * @property {DISCORD.Client} cli
- * @property {object} acts
- * @property {object} commands
- * @property {DISCORD.RichEmbed} helpEmbed
- *
- * @property {object} discord
- * @property {string} discord.token
- * @property {string} discord.clientID
- * @property {string} discord.permission
- * @property {string} discord.adminID
- * @property {boolean} discord.invitable
- *
- * @property {object} domain
- * @property {string} domain.name
- * @property {?number} domain.port
- * @property {?object} domain.tls
- * @property {?string} domain.tls.key
- * @property {?string} domain.tls.cert
- *
- * @property {object} prefix
- * @property {string} prefix.general
- * @property {string} prefix.assistant
- *
- * @property {object} presence
- * @property {number} presence.interval
- * @property {string[]|object[]} presence.list
- *
- * @property {*} ... Other constants and functions
- *
- */
-let lndr;
+// import * as character from './character';
+import * as command from './commands';
+import * as module from './modules';
+import * as presence from './presence';
 
-let kernel;
+export const wakeUp = (core, lndrConf): void => {
+  const lndr: LNDR = {
+    config: lndrConf,
+    cli: new DISCORD.Client(),
+  };
 
-export const wakeUp = (_kernel, _lndr) => {
-  // Initialize bot instance
-  lndr = _lndr;
-  kernel = _kernel;
-  lndr.cli = new DISCORD.Client();
+  // Register exit callback
+  core.onExit(() => {
+    if (lndr.cli) {
+      presence.off(core, lndr);
+    }
+  });
 
-  // Initialize leander features
-  lndr = etc.init(kernel, lndr);
-  lndr = web.init(kernel, lndr);
-  lndr = dialog.init(kernel, lndr);
-  lndr = embed.init(kernel, lndr);
-  lndr = assistant.init(kernel, lndr);
-  lndr = blhx.init(kernel, lndr);
-  lndr = guild.init(kernel, lndr);
+  // Initialize leander modules
+  module.load(core, lndr)
+  // Initialize leander commands
+    .then((loadedModules) => {
+      lndr.modules = loadedModules;
+      lndr.m = loadedModules;
+      //return command.load(core, lndr);
+    })
+  // Create required embeds, links
+    //.then(([loadedCommands, loadedActions]) => {
+      //lndr.commands = loadedCommands;
+    //});
+  // Turn on DISCORD, start processing messages
+
+  // Initialize leander commands
+  /*
+  Promise.all([
+    lndr = etc.init(kernel, lndr);
+    lndr = web.init(kernel, lndr);
+    lndr = dialog.init(kernel, lndr);
+    lndr = embed.init(kernel, lndr);
+    lndr = assistant.init(kernel, lndr);
+    lndr = blhx.init(kernel, lndr);
+    lndr = guild.init(kernel, lndr);
+  ])
 
   // Load all features and prepare them
   const commandMap = {};
@@ -246,11 +231,5 @@ export const wakeUp = (_kernel, _lndr) => {
           msg.channel.stopTyping(true);
         }
       });
-    });
-};
-
-export const goodNight = () => {
-  if (lndr.cli) {
-    presence.off(kernel, lndr);
-  }
+    }); */
 };

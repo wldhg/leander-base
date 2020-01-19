@@ -1,11 +1,11 @@
 /* Leander is subject to the terms of the Mozilla Public License 2.0.
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
+
 // Core Loader
 
 import path from 'path';
 import Log from './logger';
 import format from '../util/format';
-import iterate from '../util/iterate';
 import mkdir from '../util/mkdir';
 import random from '../util/random';
 import ordinalSuffix from '../util/ordinalSuffix';
@@ -18,7 +18,7 @@ import * as json from '../util/json';
 export const coreVersion = '1.1.5';
 
 const logInstance = new Log();
-export function log(data, title) {
+export function log(data, title): void {
   return logInstance.plain(data, title);
 }
 log.info = logInstance.info;
@@ -36,7 +36,6 @@ export const config: AppConfig = {};
 export const err = { make: parserr.make, parse: parserr.parse };
 export const util = {
   format,
-  iterate,
   mkdir,
   random,
   json,
@@ -72,14 +71,14 @@ export const init = json.parse(path.resolve('package.json'))
         context = arghelp.printHelp(config, arg)
           .then(
             () => exitmgr.code(0),
-            parserr.parse('Failed to print help message.', 2),
+            parserr.parse('도움말 출력에 실패했습니다.', 2),
           );
       }
       return context;
     }, (parseError) => {
       if (process.argv[2] === 'help') {
-        log.warn(`To see help message of a specified function, enter \`${config.name.abbr} FUNCTION --help\`.`);
+        log.warn(`특정 기능에 대한 도움말을 보려면 \`${config.name.abbr} 기능 이름 --help\` 를 입력하세요.`);
       }
-      return parserr.parse('Failed to parse arguments.', 1)(parseError);
+      return parserr.parse('인자를 읽어들이는 데 실패했습니다.', 1)(parseError);
     },
   );

@@ -1,16 +1,17 @@
 /* Leander is subject to the terms of the Mozilla Public License 2.0.
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
+
 // Program argument parsing & help module
 
 import 'colors';
 
 let err;
 
-export const setErrorModule = (parserr) => {
+export const setErrorModule = (parserr): void => {
   err = parserr;
 };
 
-export const printHelp = (config, arg) => {
+export const printHelp = (config, arg): Promise<unknown> => {
   const helpConstructor = new Promise((resolve, reject) => {
     const help = [];
     if (arg.help === true && !arg.fn.isDefault) {
@@ -27,13 +28,13 @@ export const printHelp = (config, arg) => {
       }
       nameList.forEach((callName) => {
         usageList.push(
-          `Usage: ${config.name.abbr.bold} ${callName} [OPTION]...`,
+          `사용법: ${config.name.abbr.bold} ${callName} [OPTION]...`,
         );
       });
       help.push(usageList.join('\n'));
 
 
-      const optionList = ['OPTION:'];
+      const optionList = ['옵션:'];
       if (arg.fn.options && arg.fn.options.length > 0) {
         const flagList = [];
         const descList = [];
@@ -51,7 +52,7 @@ export const printHelp = (config, arg) => {
             descList.push(config.arg.opt[opt].description);
           } else {
             reject(
-              err.make(`Option object does not exists: ${opt}`),
+              err.make(`옵션 객체가 없습니다: ${opt}`),
             );
           }
         });
@@ -69,18 +70,18 @@ export const printHelp = (config, arg) => {
           optionList.push(optString + descList[i]);
         }
       } else {
-        optionList.push('  No options available for this function.');
+        optionList.push('  이 기능에는 옵션이 없습니다.');
       }
       help.push(optionList.join('\n'));
 
       help.push(
-        `Enter ${(`${config.name.abbr} help`).bold} for available function list.`,
+        `기능 목록을 보려면 ${(`${config.name.abbr} help`).bold} 를 입력하세요.`,
       );
     } else if (arg.fn.keyword === 'help' || (arg.fn.isDefault && arg.help)) {
       help.push(`${config.name.full.bold.underline}: ${config.description}`);
-      help.push(`Usage: ${config.name.abbr.bold} [FUNCTION] [OPTION]...`);
+      help.push(`사용법: ${config.name.abbr.bold} [기능 이름] [옵션]...`);
 
-      const funcList = ['FUNCTION:'];
+      const funcList = ['기능:'];
       const keywordList = [];
       const descList = [];
       let longestKWLength = 0;
@@ -114,13 +115,13 @@ export const printHelp = (config, arg) => {
 
       help.push(funcList.join('\n'));
       help.push(
-        `Type ${
-          (`${config.name.abbr} FUNCTION --help`).bold
-        } for more information.`,
+        `${
+          (`${config.name.abbr} 기능 이름 --help`).bold
+        } 을 입력하여 해당 기능에 대한 더 자세한 정보, 옵션을 볼 수 있습니다.`,
       );
     } else {
       reject(
-        err.make('It\'s not a case of printing help message.'),
+        err.make('도움말을 표시할 조건이 아닙니다.'),
       );
     }
 
@@ -129,7 +130,7 @@ export const printHelp = (config, arg) => {
   return helpConstructor;
 };
 
-export const parse = (config, command) => {
+export const parse = (config, command): Promise<unknown> => {
   const analyzed: AppArgAnalyzed = {};
 
   return new Promise((resolve, reject) => {
@@ -137,7 +138,7 @@ export const parse = (config, command) => {
     const availableKeywords = {
       help: {
         keyword: 'help',
-        description: 'Displays this help message.',
+        description: '도움말을 출력합니다.',
       },
     };
     const functions = Object.keys(config.fn);
@@ -160,7 +161,7 @@ export const parse = (config, command) => {
     if (process.argv.length < 2) {
       reject(
         err.make(
-          'Argument input length is lack. Maybe running in unsupported environment.',
+          '프로그램에 입력된 인자 수가 부족합니다. 지원되지 않는 실행 환경일 수 있습니다.',
           { arguments: process.argv },
         ),
       );
@@ -181,9 +182,9 @@ export const parse = (config, command) => {
     } else {
       reject(
         err.make(
-          `${mainKeyword}: Unknown function. Enter ${
+          `${mainKeyword}: 없는 기능입니다. 기능 목록을 보려면 ${
             (`${command} help`).white.bold().underline
-          } for the list of available functions.`,
+          } 를 입력하세요.`,
         ),
       );
     }
@@ -192,7 +193,7 @@ export const parse = (config, command) => {
     const helpOption = {
       flags: ['-h', '--help'],
       type: 'flag',
-      description: 'Display help message.',
+      description: '도움말을 출력합니다.',
       required: false,
       name: 'help',
     };
@@ -219,12 +220,12 @@ export const parse = (config, command) => {
     // Create type checking function
     const trueStrings = ['y', 'yes', 'on', 'true', 't', '1'];
     const falseStrings = ['n', 'no', 'off', 'false', 'f', '0'];
-    const refineValue = (arg, type) => {
+    const refineValue = (arg, type): number | void | string | boolean => {
       let result;
       switch (type) {
         default: {
           reject(
-            err.make(`Unknown option type declaration: ${type}`),
+            err.make(`알 수 없는 옵션 종류입니다: ${type}`),
           );
           break;
         }
@@ -236,7 +237,7 @@ export const parse = (config, command) => {
             result = false;
           } else {
             reject(
-              err.make(`This argument must be 'true' or 'false': ${arg}`),
+              err.make(`'true' 혹은 'false'가 예상되었지만 다른 값이었습니다: ${arg}`),
             );
           }
           break;
@@ -246,7 +247,7 @@ export const parse = (config, command) => {
           result = Number(arg);
           if (Number.isNaN(result)) {
             reject(
-              err.make(`This must be a number: ${arg}`),
+              err.make(`숫자가 예상되었지만 다른 값이었습니다: ${arg}`),
             );
           }
           break;
@@ -312,12 +313,12 @@ export const parse = (config, command) => {
           }
         } else {
           reject(
-            err.make(`Unknown option keyword: ${arg}`),
+            err.make(`알 수 없는 옵션입니다: ${arg}`),
           );
         }
       } else {
         reject(
-          err.make(`Unexpected value appeared: ${arg}. Option keyword starts with '-' or '--' expected.`),
+          err.make(`알 수 없는 값입니다: ${arg}. 옵션은 '-' 또는 '--' 문자와 함께 시작합니다.`),
         );
       }
     });
@@ -326,7 +327,7 @@ export const parse = (config, command) => {
     if (analyzed.help !== true) {
       if (dataRequired > 0) {
         reject(
-          err.make(`Argument is lacked. ${dataName} requires ${dataRequiredOriginal} values but ${dataRequiredOriginal - dataRequired} values were entered.`),
+          err.make(`입력 인자 수가 부족합니다. ${dataName} 옵션은 ${dataRequiredOriginal} 개의 값이 필요하지만 받은 값의 수는 ${dataRequiredOriginal - dataRequired} 개 였습니다.`),
         );
       } else if (requiredOptionsNames.length > 0) {
         const requiredFlags = [];
@@ -334,7 +335,7 @@ export const parse = (config, command) => {
           requiredFlags.push(opt.flags);
         });
         reject(
-          err.make('Following options were required, but not entered.', requiredFlags),
+          err.make('다음 옵션은 반드시 입력되어야 합니다.', requiredFlags),
         );
       }
     }

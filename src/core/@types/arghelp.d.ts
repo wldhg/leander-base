@@ -3,7 +3,7 @@
 
 interface AppArgAnalyzed {
   fn?: AppFnItem & {
-    isDefault: boolean
-  }
-  [key: string]: boolean | number | string | string[] | AppFnItem
+    isDefault: boolean;
+  };
+  [key: string]: boolean | number | string | string[] | AppFnItem;
 }

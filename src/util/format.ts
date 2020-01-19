@@ -1,11 +1,12 @@
 /* Leander is subject to the terms of the Mozilla Public License 2.0.
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
+
 // Translate some parameters in form of '[[(_|0-9|a-Z)]]' in string
 
 /**
  * Formatter utility.
  */
-export default (message: string, dict: FormatDict) => {
+export default (message: string, dict: FormatDict): string => {
   const replaces = message.match(/\[\[[0-9a-zA-Z_]*\]\]/gm);
   let replacedCounter = 0;
   let replacedMessage = String(message);
