@@ -74,7 +74,7 @@ interface LNDRModuleHook {
 }
 
 interface LNDRCommandMeta {
-  section: string;
+  section: string | null;
   commands: string[];
   conditions: {
     DM?: boolean;
@@ -88,10 +88,12 @@ interface LNDRCommandMeta {
 
 interface LNDRCommandHelp {
   title: string;
-  description: string;
+  description?: string;
   fields?: {
     [key: string]: string;
   };
+  forServerAdmin?: string[];
+  forLndrAdmin?: string[];
 }
 
 type LNDRCommandFunction = (core: AppCore, lndr: LNDR, msg: LNDRParsedMessage) => void;

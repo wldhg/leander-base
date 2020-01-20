@@ -21,29 +21,23 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
 
     // Construct help embed
     const command = msg.arguments[0];
+    const metaContent = lndr.meta[command];
     const helpContent = lndr.help[command];
 
     if (helpContent) {
       // Put content to the embed
       const helpEmbed = lndr.embed.create(helpContent.title);
-      helpEmbed.setDescription(helpContent.description);
 
       let needsServerAdminPermission = false;
       let needsLndrAdminPermission = false;
-      if (helpContent === null) {
-        helpEmbed.setDescription(
-          commandObject.help
-            ? core.util.format(commandObject.help, format)
-            : '이 명령어는 따로 도움말이 없습니다.',
-        );
-      } else {
-        // Put description
+
+      if (helpContent.description || helpContent.fields) {
         if (helpContent.description) {
           helpEmbed.setDescription(
             core.util.format(`${helpContent.description}\n${lndr.dummy}`, format),
           );
         } else {
-          helpEmbed.setDescription(lndr.dummyChar);
+          helpEmbed.setDescription(lndr.dummy);
         }
 
         // Put fields
@@ -52,15 +46,15 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
             // Get title
             let fieldTitle = title.length > 0 ? `${title} ` : `${lndr.dummy} `;
             if (
-              helpContent.serverAdminPermissionRequired instanceof Array
-              && helpContent.serverAdminPermissionRequired.includes(title)
+              helpContent.forServerAdmin instanceof Array
+              && helpContent.forServerAdmin.includes(title)
             ) {
               fieldTitle += '👑';
               needsServerAdminPermission = true;
             }
             if (
-              helpContent.lndrAdminPermissionRequired instanceof Array
-              && helpContent.lndrAdminPermissionRequired.includes(title)
+              helpContent.forLndrAdmin instanceof Array
+              && helpContent.forLndrAdmin.includes(title)
             ) {
               fieldTitle += '🔧';
               needsLndrAdminPermission = true;
@@ -77,39 +71,47 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
             helpEmbed.addField(fieldTitle, fieldBody, true);
           });
         }
+      } else {
+        helpEmbed.setDescription(`${lndr.t('system.help.no_content')}\n${lndr.dummy}`);
       }
 
       // Put permission message
-      if (commandObject.help) {
+      if (metaContent) {
         let permissionMessage = '';
-        if (commandObject.conditions.DM === true) {
-          permissionMessage += '이 명령어는 DM 채널에서만 사용할 수 있어요.\n';
-        } else if (commandObject.conditions.DM === false) {
-          permissionMessage += 'DM 채널에서는 이 명령어를 사용할 수 없어요.\n';
+        if (metaContent.conditions.DM === true) {
+          permissionMessage += `${lndr.t('system.help.only_dm')}\n`;
+        } else if (metaContent.conditions.DM === false) {
+          permissionMessage += `${lndr.t('system.help.not_dm')}\n`;
         }
-        if (commandObject.conditions.lndrAdmin === true) {
-          permissionMessage += '이 명령어는 리엔더 관리자만이 사용할 수 있어요.\n';
+        if (metaContent.conditions.lndrAdmin === true) {
+          permissionMessage += `${lndr.t('system.help.only_lndrAdmin')}\n`;
         }
-        if (commandObject.conditions.serverAdmin === true) {
-          permissionMessage += '이 명령어는 디스코드 서버 관리자만이 사용할 수 있어요.\n';
-        }
-        if (
-          commandObject.conditions.author
-          && commandObject.conditions.author.length > 0
-        ) {
-          permissionMessage += '이 명령어는 특정 지휘관님만 사용할 수 있어요.\n';
+        if (metaContent.conditions.guildAdmin === true) {
+          permissionMessage += `${lndr.t('system.help.only_guildAdmin')}\n`;
         }
         if (
-          commandObject.conditions.channel
-          && commandObject.conditions.channel.length > 0
+          metaContent.conditions.author
+          && metaContent.conditions.author.length > 0
         ) {
-          permissionMessage += '이 명령어는 특정 채널에서만 사용할 수 있어요.\n';
+          permissionMessage += `${lndr.t('system.help.some_author')}\n`;
+        }
+        if (
+          metaContent.conditions.channel
+          && metaContent.conditions.channel.length > 0
+        ) {
+          permissionMessage += `${lndr.t('system.help.some_channel')}\n`;
+        }
+        if (
+          metaContent.conditions.guild
+          && metaContent.conditions.guild.length > 0
+        ) {
+          permissionMessage += `${lndr.t('system.help.some_guild')}\n`;
         }
         if (needsServerAdminPermission) {
-          permissionMessage += '👑 : 디스코드 서버 관리자 권한이 필요해요.\n';
+          permissionMessage += `👑 : ${lndr.t('system.help.need_guildAdmin')}\n`;
         }
         if (needsLndrAdminPermission) {
-          permissionMessage += '🔧 : 리엔더 관리자 권한이 필요해요.\n';
+          permissionMessage += `🔧 : ${lndr.t('system.help.need_lndrAdmin')}\n`;
         }
         if (permissionMessage.length > 0) {
           helpEmbed.addField('**─**', `${permissionMessage.trim()}`);
@@ -118,10 +120,10 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
 
       // Finalioze and send help embed
       helpEmbed.setColor(0xe5a9c3);
-      helpEmbed.setFooter(`${commandObject.section === null ? '기타' : commandObject.section} > ${command}`);
+      helpEmbed.setFooter(`${metaContent.section === null ? '알 수 없음' : metaContent.section} > ${command}`);
       msg.send(helpEmbed);
     } else {
-      msg.send(`\`${command}\`는 없는 명령어에요. 다시 확인해주시겠어요?`);
+      msg.send(lndr.t('system.help.no_command', command));
     }
   }
 };

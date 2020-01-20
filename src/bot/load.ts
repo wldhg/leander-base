@@ -54,13 +54,13 @@ export const wakeUp = (core, lndrConf): void => {
       const helpStructure = {};
       loadedCommands.forEach((aCommand) => {
         if (aCommand.meta.commands.length > 0) {
-          if (aCommand.meta.section.length > 0) {
+          if (aCommand.meta.section && aCommand.meta.section.length > 0) {
             if (!helpStructure[aCommand.meta.section]) {
               helpStructure[aCommand.meta.section] = [];
             }
             helpStructure[aCommand.meta.section].push(aCommand.meta.commands[0]);
           } else {
-            core.log.warn(`명령어 모음에 표시되지 않는 명령어가 있습니다: ${aCommand.meta.commands.join(', ')}`);
+            core.log.warn(`명령어 모음(전체 도움말)에 표시되지 않는 명령어가 있습니다: ${aCommand.meta.commands.join(', ')}`);
           }
         } else {
           core.log.warn(`접근할 수 없는 명령어가 있습니다: ${aCommand.help.title}`);
@@ -91,7 +91,7 @@ export const wakeUp = (core, lndrConf): void => {
       lndr.cli.on('ready', () => {
         presence.on(core, lndr);
         core.log.okay(`디스코드 봇 계정으로 로그인하였습니다: ${lndr.cli.user.tag}`);
-        core.log.info('지금부터 메시지를 처리하기 시작합니다.');
+        core.log.info(`지금부터 메시지를 처리하겠습니다. 명령어 접두사는 ${lndr.config.prefix} 입니다.`);
       });
       lndr.cli.on('message', (msg) => {
         try {

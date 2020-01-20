@@ -26,7 +26,7 @@ export const getT = (core: AppCore, lndrConf: LNDRConfig): LNDRTranslateFunction
     }
     let translated;
     if (typeof txSentence === 'string') {
-      translated = core.util.format(txSentence, args);
+      translated = core.util.format(txSentence, args).replace(/\\n/g, '\n');
     } else {
       core.log.error(`인격 번역을 완료할 수 없습니다: ${txSentence}`);
       translated = sentence;

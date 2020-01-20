@@ -18,7 +18,7 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
   const isPingBad = lndr.cli.ping > 200;
   msg.send(
     lndr.embed.create(
-      isPingBad ? lndr.t('system.ping.bad') : lndr.t('system.ping.good'),
+      isPingBad ? `☁  ${lndr.t('system.ping.bad')}` : `🌞  ${lndr.t('system.ping.good')}`,
       lndr.t('system.ping.message', lndr.cli.ping.toString()),
       isPingBad ? 0x5e5e5e : 0xffd400,
     ),
