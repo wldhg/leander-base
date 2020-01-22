@@ -5,7 +5,7 @@ import './types';
 
 import * as DISCORD from 'discord.js';
 import * as commander from './commands';
-import { checkPerm, MessageType } from './message';
+import { checkPerm, MessageType, parseMessageText } from './message';
 import * as moduler from './modules';
 import * as presence from './presence';
 import * as translate from './translate';
@@ -78,7 +78,11 @@ export const wakeUp = (core, lndrConf): void => {
     })
   // Create help embed
     .then((helpStructure) => {
-      lndr.helpEmbed = lndr.embed.create(lndr.t('bot.help.h1'), `${lndr.t('bot.help.h2')}\n${lndr.dummy}`, 0xffe2ec);
+      lndr.helpEmbed = new DISCORD.RichEmbed({
+        title: lndr.t('bot.help.h1'),
+        description: `${lndr.t('bot.help.h2')}\n${lndr.dummy}`,
+        color: 0xffe2ec,
+      });
       Object.keys(helpStructure).forEach((key) => {
         lndr.helpEmbed.addField(key, `\`${helpStructure[key].join('`, `')}\`\n${lndr.dummy}`);
       });
@@ -199,7 +203,7 @@ export const wakeUp = (core, lndrConf): void => {
               }
               if (msg.content.indexOf(lndr.config.prefix) === 0) {
                 // Leander command part
-                const pmsg = lndr.tools.parseMessageText(lndr.config.prefix, msg.content);
+                const pmsg = parseMessageText(lndr.config.prefix, msg.content);
                 pmsg.raw = msg;
                 pmsg.send = (data): Promise<DISCORD.Message | DISCORD.Message[]> => msg.channel
                   .send(data);

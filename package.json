@@ -1,6 +1,6 @@
 {
   "name": "leander-base",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "디스코드 커뮤니티 서버용 봇 베이스",
   "main": "./src/lndr.ts",
   "repository": "https://github.com/wldh-g/leander-base.git",
@@ -40,7 +40,6 @@
     "markdown-it": "^10.0.0",
     "mime-types": "^2.1.26",
     "moment": "^2.24.0",
-    "request": "^2.88.0",
     "safe-eval": "^0.4.1",
     "ts-node": "^8.6.2",
     "typescript": "^3.7.5"
