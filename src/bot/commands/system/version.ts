@@ -3,15 +3,15 @@
 
 export const meta: LNDRCommandMeta = {
   section: '기타',
-  commands: ['버전', 'version'],
+  commands: ['버전', 'version', 'ver'],
   conditions: {},
 };
 
 export const help: LNDRCommandHelp = {
-  title: '<:lndrcircle:590238436758257719>  버전 정보',
-  description: '버전 정보를 표시합니다.',
+  title: '[[bot:emoji]]  버전 정보',
+  description: 't:system.version.help',
 };
 
 export const fn: LNDRCommandFunction = (core, lndr, msg) => {
-  msg.raw.channel.send(lndr.t('system.version', core.config.version));
+  msg.raw.channel.send(lndr.t('system.version.info', core.config.version));
 };

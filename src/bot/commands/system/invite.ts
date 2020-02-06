@@ -9,7 +9,7 @@ export const meta: LNDRCommandMeta = {
 
 export const help: LNDRCommandHelp = {
   title: '📧  초대하기',
-  description: '봇 초대 링크를 표시합니다.',
+  description: 't:system.invite.help',
 };
 
 export const fn: LNDRCommandFunction = (core, lndr, msg) => {

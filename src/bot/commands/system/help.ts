@@ -9,16 +9,23 @@ export const meta: LNDRCommandMeta = {
 
 export const help: LNDRCommandHelp = {
   title: '🤷‍  도움말',
-  description: '각종 명령어와 언어에 대해 도움말을 표시합니다.\n`[[prefix]]도움말`을 입력하면 전체 명령어 목록을 볼 수 있습니다.',
+  description: 't:system.help.help',
 };
 
 export const fn: LNDRCommandFunction = (core, lndr, msg) => {
+  const translate = (sentence: string): string => {
+    let translated = '';
+    if (sentence.indexOf('t:') === 0) {
+      translated = lndr.t(sentence.substring(2));
+    } else {
+      translated = core.util.format(sentence, lndr.tDict);
+    }
+    return translated;
+  };
+
   if (msg.arguments.length === 0) {
     msg.send(lndr.helpEmbed);
   } else {
-    // Define formatting constant
-    const format = { prefix: lndr.config.prefix };
-
     // Construct help embed
     const command = msg.arguments[0];
     const metaContent = lndr.meta[command];
@@ -26,16 +33,14 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
 
     if (helpContent) {
       // Put content to the embed
-      const helpEmbed = lndr.embed.create(helpContent.title);
+      const helpEmbed = lndr.embed.create(translate(helpContent.title));
 
       let needsServerAdminPermission = false;
       let needsLndrAdminPermission = false;
 
       if (helpContent.description || helpContent.fields) {
         if (helpContent.description) {
-          helpEmbed.setDescription(
-            core.util.format(`${helpContent.description}\n${lndr.dummy}`, format),
-          );
+          helpEmbed.setDescription(`${translate(helpContent.description)}\n${lndr.dummy}`);
         } else {
           helpEmbed.setDescription(lndr.dummy);
         }
@@ -44,7 +49,7 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
         if (helpContent.fields) {
           Object.keys(helpContent.fields).forEach((title) => {
             // Get title
-            let fieldTitle = title.length > 0 ? `${title} ` : `${lndr.dummy} `;
+            let fieldTitle = title.length > 0 ? `${translate(title)} ` : `${lndr.dummy} `;
             if (
               helpContent.forServerAdmin instanceof Array
               && helpContent.forServerAdmin.includes(title)
@@ -59,13 +64,10 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
               fieldTitle += '🔧';
               needsLndrAdminPermission = true;
             }
-            fieldTitle = core.util.format(fieldTitle, format);
+            fieldTitle = core.util.format(fieldTitle, lndr.tDict);
 
             // Get body
-            const fieldBody = core.util.format(
-              `${helpContent.fields[title]}\n${lndr.dummy}`,
-              format,
-            );
+            const fieldBody = `${translate(helpContent.fields[title])}\n${lndr.dummy}`;
 
             // Go, field!
             helpEmbed.addField(fieldTitle, fieldBody, true);

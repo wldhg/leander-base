@@ -15,6 +15,7 @@ type LNDR = {
   };
   dummy: '\u200B';
   t: LNDRTranslateFunction;
+  tDict: object;
   fn: {
     [key: string]: LNDRCommandFunction;
   };
@@ -32,7 +33,7 @@ interface LNDRConfig {
   discord: {
     token: string;
     clientID: string;
-    permission: '305655160';
+    permission: string;
     adminID: string;
     invitable: boolean;
   };
@@ -49,7 +50,10 @@ interface LNDRConfig {
     interval: number;
     list: LNDRPresence[];
   };
-  character: 'default' | string;
+  lang: 'ko-kr' | string;
+  addressing: string;
+  name: string;
+  emoji?: string;
 }
 
 type LNDRPresence = string | {

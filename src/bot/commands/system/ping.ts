@@ -9,7 +9,7 @@ export const meta: LNDRCommandMeta = {
 
 export const help: LNDRCommandHelp = {
   title: '📡  핑',
-  description: '서버 통신 지연 시간을 표시합니다.',
+  description: 't:system.ping.help',
 };
 
 export const fn: LNDRCommandFunction = (core, lndr, msg) => {
@@ -19,7 +19,7 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
   msg.send(
     lndr.embed.create(
       isPingBad ? `☁  ${lndr.t('system.ping.bad')}` : `🌞  ${lndr.t('system.ping.good')}`,
-      lndr.t('system.ping.message', lndr.cli.ping.toString()),
+      lndr.t('system.ping.message', (Math.round(lndr.cli.ping * 1000) / 1000).toString()),
       isPingBad ? 0x5e5e5e : 0xffd400,
     ),
   );

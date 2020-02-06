@@ -13,7 +13,7 @@ type FormatDict = FormatDictObject | FormatDictArray;
  * Formatter utility.
  */
 export default (message: string, dict: FormatDict): string => {
-  const replaces = message.match(/\[\[[0-9a-zA-Z_]*\]\]/gm);
+  const replaces = message.match(/\[\[[0-9a-zA-Z_:]*\]\]/gm);
   let replacedCounter = 0;
   let replacedMessage = String(message);
 

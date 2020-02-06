@@ -16,6 +16,7 @@ export const wakeUp = (core, lndrConf): void => {
     cli: new DISCORD.Client(),
     dummy: '\u200B',
     t: translate.getT(core, lndrConf),
+    tDict: translate.botDict,
     fn: {},
     help: {},
     meta: {},
@@ -86,7 +87,7 @@ export const wakeUp = (core, lndrConf): void => {
       Object.keys(helpStructure).forEach((key) => {
         lndr.helpEmbed.addField(key, `\`${helpStructure[key].join('`, `')}\`\n${lndr.dummy}`);
       });
-      lndr.helpEmbed.addField(lndr.dummy, lndr.t('bot.help.footer', lndr.config.prefix));
+      lndr.helpEmbed.addField(lndr.dummy, lndr.t('bot.help.footer'));
       lndr.helpEmbed.setFooter(lndr.t('bot.help.message'));
     })
   // Turn on DISCORD, start processing messages
