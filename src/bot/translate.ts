@@ -14,7 +14,7 @@ export const getT = (core: AppCore, lndrConf: LNDRConfig): LNDRTranslateFunction
   botDict['bot:nameIGa'] = lndrConf.name;
   botDict['bot:nameEunNeun'] = lndrConf.name;
   botDict['bot:addressing'] = lndrConf.addressing;
-  botDict['bot:emoji'] = lndrConf.emoji;
+  botDict['bot:emoji'] = lndrConf.emoji ? lndrConf.emoji : ':robot:';
   botDict['bot:prefix'] = lndrConf.prefix;
 
   // Export Translator

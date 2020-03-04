@@ -2,9 +2,9 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "commonjs",
-    "target": "esnext",
+    "target": "es2018",
     "lib": [
-      "esnext",
+      "es2018",
       "dom",
     ],
     "allowJs": true,

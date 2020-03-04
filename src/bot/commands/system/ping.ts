@@ -15,11 +15,11 @@ export const help: LNDRCommandHelp = {
 export const fn: LNDRCommandFunction = (core, lndr, msg) => {
   msg.raw.react('💕');
 
-  const isPingBad = lndr.cli.ping > 200;
+  const isPingBad = lndr.cli.ws.ping > 200;
   msg.send(
     lndr.embed.create(
       isPingBad ? `☁  ${lndr.t('system.ping.bad')}` : `🌞  ${lndr.t('system.ping.good')}`,
-      lndr.t('system.ping.message', (Math.round(lndr.cli.ping * 1000) / 1000).toString()),
+      lndr.t('system.ping.message', (Math.round(lndr.cli.ws.ping * 1000) / 1000).toString()),
       isPingBad ? 0x5e5e5e : 0xffd400,
     ),
   );

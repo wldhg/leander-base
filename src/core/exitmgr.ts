@@ -4,8 +4,6 @@
 // Exit control module
 
 let log;
-let exitPromise;
-let exitResolve;
 let exitStarted = false;
 const exitHandlers = [];
 
@@ -13,18 +11,15 @@ export const setLogger = (logger): void => {
   log = logger;
 };
 
-export const code = (exitCode?: number): Promise<void> => {
+export const code = (exitCode?: number): void => {
   if (!exitStarted) {
-    exitPromise = new Promise((resolve) => {
-      exitResolve = resolve;
-    });
     exitStarted = true;
     setTimeout(() => process.exit(exitCode), 0);
   }
-  return exitPromise;
 };
 
-export const onExit = (fn: () => void): void => {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const onExit = (fn: () => Promise<any>): void => {
   if (typeof fn === 'function') {
     exitHandlers.push(fn);
   } else {
@@ -32,24 +27,41 @@ export const onExit = (fn: () => void): void => {
   }
 };
 
-// Detecting process interrupt events
-process.on('exit', () => {
+const procExitHandlers = (exitCode): Promise<any> => {
+  // Start handling handlers
+  const exitHandled: Promise<any>[] = [];
   for (let i = 0; i < exitHandlers.length; i += 1) {
-    exitHandlers[i]();
+    exitHandled.push(exitHandlers[i]());
   }
-  if (typeof exitResolve === 'function') {
-    exitResolve();
-  }
-});
+  const all = Promise.all(exitHandled);
+
+  // Burn the bridges
+  const bridgeTimeout = setTimeout(() => {
+    log.warn('모든 종료 핸들러가 처리되지 않았습니다.');
+    code(exitCode);
+  }, 20000);
+
+  return all.then(() => {
+    clearTimeout(bridgeTimeout);
+    code(exitCode);
+  });
+};
+
+// Detecting process interrupt events
 process.on('SIGUSR2', () => {
-  log.warn('시스템 인터럽트가 감지되었습니다.', 'SIGUSR2');
-  code(0);
+  log.warn('시스템 인터럽트를 받았습니다.', 'SIGUSR2');
+  procExitHandlers(0);
 });
 process.on('SIGUSR1', () => {
-  log.warn('시스템 인터럽트가 감지되었습니다.', 'SIGUSR1');
-  code(0);
+  log.warn('시스템 인터럽트를 받았습니다.', 'SIGUSR1');
+  procExitHandlers(0);
 });
 process.on('SIGINT', () => {
-  log.warn('프로그램을 종료합니다. 안녕히 가세요.', 'SIGINT');
-  code(0);
+  log.warn('시스템 인터럽트를 받았습니다.', 'SIGINT');
+  procExitHandlers(0);
+});
+
+// Bye!
+process.on('exit', () => {
+  log.okay('프로그램을 종료합니다. 안녕히 가세요.', 'BYE');
 });

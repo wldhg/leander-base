@@ -13,7 +13,7 @@ class Embed implements LNDRModule {
   public name = 'embed';
 
   public acts = {
-    create: (title: string, description: string, ...prop: EmbedContent[]): DISCORD.RichEmbed => {
+    create: (title: string, description: string, ...prop: EmbedContent[]): DISCORD.MessageEmbed => {
       // Ingredients
       const sections = [];
       let color = 0xff96a9;
@@ -49,7 +49,7 @@ class Embed implements LNDRModule {
       }
 
       // Create new embed
-      const embed = new DISCORD.RichEmbed({
+      const embed = new DISCORD.MessageEmbed({
         title,
         description,
         color,

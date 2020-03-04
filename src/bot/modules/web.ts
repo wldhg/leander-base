@@ -112,8 +112,15 @@ class Web implements LNDRModule {
     this.lndr = lndr;
 
     // Check is configured to use web
-    if (!lndr.config.domain) {
+    let haveToExit = false;
+    if (!lndr.config.web) {
+      reject(new Error('web::init - 웹 서비스를 사용하도록 설정되지 않았습니다.'));
+      haveToExit = true;
+    } else if (!lndr.config.web.domain) {
       reject(new Error('web::init - 웹 서비스를 위한 도메인이 설정되지 않았습니다.'));
+      haveToExit = true;
+    }
+    if (haveToExit) {
       return;
     }
 

@@ -45,6 +45,7 @@ class Dialog implements LNDRModule {
           timeoutCallback,
           timeoutID,
         };
+        this.lndr.serverlock.addException(msg.author.id);
       }
     },
   };
@@ -52,7 +53,11 @@ class Dialog implements LNDRModule {
   public hooks = [
     {
       on: MessageType.DEFAULT,
-      checker: (msg: DISCORD.Message): boolean => Boolean(this.getContext(msg)),
+      checker: (msg: DISCORD.Message):
+        Promise<LNDRModuleHookCheckResult> => Promise.resolve({
+        triggered: Boolean(this.getContext(msg)),
+        preventDefault: true,
+      }),
       fn: (msg: DISCORD.Message): void => {
         this.continueConversation(msg, this.getContext(msg));
       },
@@ -96,6 +101,7 @@ class Dialog implements LNDRModule {
     () => {
       msg.channel.send(this.lndr.t('module.dialog.close', this.lndr.tools.mention(msg.author), String(timeout)));
       delete this.contextInUse[cid];
+      this.lndr.serverlock.removeException(msg.author.id);
       timeoutCallback(msg, timeout);
     },
     timeout * 1000,
@@ -112,6 +118,7 @@ class Dialog implements LNDRModule {
       try {
         if (context.answerCallback(context.origMsg, msg, context.timeout)) {
           delete this.contextInUse[context.cid];
+          this.lndr.serverlock.removeException(msg.author.id);
         } else {
           this.contextInUse[context.cid].timeoutID = this.startConversationTimeout(
             msg, context.timeout, context.cid, context.timeoutCallback,

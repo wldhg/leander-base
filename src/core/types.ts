@@ -13,13 +13,13 @@ interface AppCore {
     okay: AppLogFunction;
     i: number;
   };
-  exit: (exitCode?: number) => Promise<void>;
-  onExit: (fn: () => void) => void;
+  exit: (exitCode?: number) => void;
+  onExit: (fn: () => Promise<any>) => void;
   arg: AppArgAnalyzed;
   config: AppConfig;
   err: {
     make: (msg: any, addi?: any) => Error;
-    parse: (desc: any, exitCode?: number) => (e: Error) => Promise<void>;
+    parse: (desc: any, exitCode?: number|'silent') => (e: Error) => Promise<void>;
   };
   util: {
     format: AppFunction;

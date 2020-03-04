@@ -8,6 +8,11 @@ type LNDRModuleNames = 'dialog' | 'tools' | 'embed';
 type LNDR = {
   config: LNDRConfig;
   cli: import('discord.js').Client;
+  serverlock: {
+    isException: (id: import('discord.js').Snowflake) => boolean;
+    addException: (id: import('discord.js').Snowflake) => void;
+    removeException: (id: import('discord.js').Snowflake) => void;
+  };
   commands?: LNDRCommand[];
   modules?: LNDRModule[];
   hooks?: {
@@ -25,20 +30,21 @@ type LNDR = {
   meta: {
     [key: string]: LNDRCommandMeta;
   };
-  helpEmbed?: import('discord.js').RichEmbed;
+  helpEmbed?: import('discord.js').MessageEmbed;
   [key: string]: LNDRModuleActs | any;
 }
 
 interface LNDRConfig {
   discord: {
     token: string;
-    clientID: string;
+    clientID: import('discord.js').Snowflake;
     permission: string;
     adminID: string;
     invitable: boolean;
   };
-  domain?: {
-    name: string;
+  serverlock?: import('discord.js').Snowflake[];
+  web?: {
+    domain: string;
     port?: number;
     tls?: {
       key: string;
@@ -54,17 +60,20 @@ interface LNDRConfig {
   addressing: string;
   name: string;
   emoji?: string;
+  point?: boolean;
 }
 
-type LNDRPresence = string | {
+type LNDRActivity = {
   name: string;
-  url: string;
-  type: import('discord.js').ActivityType | number;
+  type: import('discord.js').ActivityType;
+  url?: string;
+  shardID?: number | number[];
 };
+type LNDRPresence = string | LNDRActivity;
 
 interface LNDRModule {
   name: string;
-  init: (core: AppCore, lndr: LNDR) => Promise<void>;
+  init: (core: AppCore, lndr: LNDR, deps?: LNDRModuleDep) => Promise<void>;
   acts?: LNDRModuleActs;
   hooks?: LNDRModuleHook[];
 }
@@ -73,8 +82,20 @@ interface LNDRModuleActs {
 }
 interface LNDRModuleHook {
   on: import('./message').MessageType;
-  checker: (msg: import('discord.js').Message) => boolean;
+  checker: (msg: import('discord.js').Message) => Promise<LNDRModuleHookCheckResult>;
   fn: (msg: import('discord.js').Message) => void;
+}
+interface LNDRModuleHookCheckResult {
+  triggered: boolean;
+  preventDefault: boolean;
+}
+interface LNDRModuleDepNotResolved {
+  module: LNDRModule;
+  deps: string[];
+  path: string;
+}
+interface LNDRModuleDep {
+  [key: string]: LNDRModule;
 }
 
 interface LNDRCommandMeta {
@@ -118,7 +139,10 @@ interface LNDRParsedMessage {
   codeSegments?: LNDRParsedMessageSegment[];
   arguments?: string[];
   raw?: import('discord.js').Message;
-  send?: (content?: import('discord.js').StringResolvable, opts?: import('discord.js').MessageOptions | import('discord.js').Attachment | import('discord.js').RichEmbed) => Promise<import('discord.js').Message | import('discord.js').Message[]>;
+  send?: (
+      content?: import('discord.js').StringResolvable,
+      options?: (import('discord.js').MessageOptions & { split: true | import('discord.js').SplitOptions }) | import('discord.js').MessageAdditions,
+    ) => Promise<import('discord.js').Message[] | import('discord.js').Message>;
   channel?: import('discord.js').Channel;
   author?: import('discord.js').User;
   guild?: import('discord.js').Guild;
