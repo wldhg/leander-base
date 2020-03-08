@@ -1,6 +1,6 @@
 {
   "name": "leander-base",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "description": "디스코드 커뮤니티 서버용 봇 베이스, 리엔더",
   "main": "./src/lndr.ts",
   "repository": "https://github.com/wldh-g/leander-base.git",
