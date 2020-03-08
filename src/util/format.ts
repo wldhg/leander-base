@@ -3,6 +3,8 @@
 
 // Translate some parameters in form of '[[(_|0-9|a-Z)]]' in string
 
+/* eslint-disable no-else-return */
+
 type FormatDictObject = {
   [key: string]: string;
 }
@@ -12,8 +14,8 @@ type FormatDict = FormatDictObject | FormatDictArray;
 /**
  * Formatter utility.
  */
-export default (message: string, dict: FormatDict): string => {
-  const replaces = message.match(/\[\[[0-9a-zA-Z_:]*\]\]/gm);
+const format = (message: string, dict: FormatDict, depth = 0): string => {
+  const replaces = message.match(/\[\[[0-9a-zA-Z_:.]*\]\]/gm);
   let replacedCounter = 0;
   let replacedMessage = String(message);
 
@@ -38,7 +40,14 @@ export default (message: string, dict: FormatDict): string => {
         }
       }
     }
+    if (depth > 10) {
+      return replacedMessage;
+    } else {
+      return format(replacedMessage, dict, depth + 1);
+    }
+  } else {
+    return replacedMessage;
   }
-
-  return replacedMessage;
 };
+
+export default format;

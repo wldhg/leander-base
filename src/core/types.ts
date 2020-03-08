@@ -5,14 +5,7 @@
 
 interface AppCore {
   coreVersion: string;
-  log: AppLogFunction & {
-    info: AppLogFunction;
-    error: AppLogFunction;
-    debug: AppLogAnyFunction;
-    warn: AppLogFunction;
-    okay: AppLogFunction;
-    i: number;
-  };
+  log: AppCoreLogFunction;
   exit: (exitCode?: number) => void;
   onExit: (fn: () => Promise<any>) => void;
   arg: AppArgAnalyzed;
@@ -21,13 +14,7 @@ interface AppCore {
     make: (msg: any, addi?: any) => Error;
     parse: (desc: any, exitCode?: number|'silent') => (e: Error) => Promise<void>;
   };
-  util: {
-    format: AppFunction;
-    json: AppFunctions;
-    mkdir: AppFunction;
-    ordinalSuffix: AppFunction;
-    random: AppFunction;
-  };
+  util: AppCoreUtil;
   init: Promise<any>;
 }
 
@@ -38,6 +25,22 @@ type AppFunctions = {
   };
 };
 
+type AppCoreUtil = {
+  format: AppFunction;
+  json: AppFunctions;
+  mkdir: AppFunction;
+  ordinalSuffix: AppFunction;
+  random: AppFunction;
+};
+
+type AppCoreLogFunction = AppLogFunction & {
+  info: AppLogFunction;
+  error: AppLogFunction;
+  debug: AppLogAnyFunction;
+  warn: AppLogFunction;
+  okay: AppLogFunction;
+  i: number;
+};
 type AppLogFunction = (data: string, title?: string) => void;
 type AppLogAnyFunction = (data: any, title?: string) => void;
 

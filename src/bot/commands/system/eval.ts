@@ -19,9 +19,11 @@ export const help: LNDRCommandHelp = {
   title: '🕵️ EVAL',
 };
 
-export const fn: LNDRCommandFunction = (core, lndr, msg) => {
+export const deps: LNDRCommandDeps = [];
+
+export const fn: LNDRCommandFunction = (lndr, acts, msg) => {
   const evalContext = {
-    core, lndr, msg, moment, os, util,
+    lndr, acts, msg, moment, os, util,
   };
 
   if (msg.channel instanceof DISCORD.TextChannel) {

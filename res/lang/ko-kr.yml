@@ -50,3 +50,23 @@ system:
     denied: '저는 다른 서버에 초대받을 수 없도록 설정되어 있어요.\n더욱 자세한 정보는 [[0]] [[bot:addressing]]님께 여쭈어 보아 주세요.'
   log:
     success: '[[bot:addressing]]님, 보내신 메시지가 `[[0]]` 번 로그에 저장되었어요.'
+  chkperm:
+    info: '[[0]] [[bot:addressing]]님의 권한은 아래와 같아요.\n개발에 도움이 되시길 바랄게요, [[bot:addressing]]님!'
+
+guild:
+  point:
+    help: '이 디스코드 서버에서 [[bot:addressing]]님의 포인트를 보여드려요.'
+    see_mine: '`[[bot:prefix]]포인트`를 입력하면 [[bot:addressing]]님의 포인트를 볼 수 있어요.'
+    see_others: '`[[bot:prefix]]포인트 (@멤버/ID)`를 입력하면 다른 멤버의 포인트를 볼 수 있어요.'
+    change: '`[[bot:prefix]]포인트 [+-]양 (@멤버/ID) [@멤버/ID...]`를 입력하면 다른 멤버(들)의 포인트를 변경할 수 있어요.'
+    no_perm: '서버 관리자만이 다른 분의 포인트를 관리할 수 있어요.'
+    invalid_amount: '포인트 수량 지정이 잘못되었어요. 다시 한 번 확인해주시겠어요?'
+    change_confirm: '[[0]] [[bot:addressing]]님의 포인트를 [[1]]만큼 [[2]]하려고 해요.\n"[[3]]" 또는 [[2]] 사유를 말씀해주세요.'
+    change_cancel: '포인트 [[0]]을 취소했어요.'
+    change_fail_negative: '변경 이후 [[0]] [[bot:addressing]]님의 포인트가 음수가 되어 변경할 수 없었어요. 다시 한 번 확인해주세요.'
+    change_fail_unknown: '[[0]] [[bot:addressing]]님의 포인트를 변경할 수 없었어요. 오류는 서버 내부에 기록했으니, 저를 관리해주시는 [[bot:addressing]]님께 말씀 부탁드릴게요!'
+    change_finished: '[[0]] 내용을 모두 처리했어요!'
+    change_timeout: '[[0]]초 동안 말이 없으셔서 [[1]]을 취소했어요.'
+    footer_link: '위 링크는 보안을 위해 1시간 뒤부터는 볼 수 없어요.'
+    footer_contact: '적립 및 사용 기록은 저의 관리를 담당하시는 [[bot:addressing]]님께 물어봐주세요.'
+    link: '위 링크에서 확인하실 수 있어요.'

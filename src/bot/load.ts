@@ -2,6 +2,7 @@
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
 
 import './types';
+import './modules/types';
 
 import * as DISCORD from 'discord.js';
 import * as commander from './commands';
@@ -11,7 +12,7 @@ import * as moduler from './modules';
 import * as presence from './presence';
 import * as translate from './translate';
 
-const procMessageHook = (core: AppCore, lndr: LNDR, msg: DISCORD.Message, msgType: MessageType):
+const procMessageHook = (core: AppCore, lndr: LNDRBase, msg: DISCORD.Message, msgType: MessageType):
   Promise<LNDRModuleHookCheckResult> => new Promise((resolve) => {
   if (lndr.hooks[msgType]) {
     const hooks = lndr.hooks[msgType];
@@ -56,7 +57,7 @@ const procMessageHook = (core: AppCore, lndr: LNDR, msg: DISCORD.Message, msgTyp
 });
 
 export const wakeUp = (core: AppCore, lndrConf): void => {
-  const lndr: LNDR = {
+  const lndr: LNDRBase = {
     config: lndrConf,
     cli: new DISCORD.Client({
       retryLimit: 3,
@@ -71,6 +72,8 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
     meta: {},
     hooks: {},
   };
+
+  const acts: LNDRActs = {};
 
   // Register exit callback
   core.onExit(() => new Promise((resolve) => {
@@ -89,8 +92,10 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
   moduler.load(core, lndr)
   // Initialize leander modules, read leander commands
     .then((loadedModules) => {
+      const moduleNames: string[] = [];
       loadedModules.forEach((aModule) => {
-        lndr[aModule.name] = aModule.acts;
+        moduleNames.push(aModule.name);
+        acts[aModule.name] = aModule.acts;
         if (aModule.hooks) {
           aModule.hooks.forEach((hook) => {
             if (!lndr.hooks[hook.on]) {
@@ -103,7 +108,7 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
       });
       lndr.modules = loadedModules;
       core.log.info(`${Object.keys(loadedModules).length} 개의 모듈이 로드되었습니다.`);
-      return commander.load(core, lndr);
+      return commander.load(core, lndr, moduleNames);
     })
   // Initialize leander commands with compose help structure
     .then((loadedCommands: LNDRCommand[]) => {
@@ -135,8 +140,8 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
   // Create help embed
     .then((helpStructure) => {
       lndr.helpEmbed = new DISCORD.MessageEmbed({
-        title: lndr.t('bot.help.h1'),
-        description: `${lndr.t('bot.help.h2')}\n${lndr.dummy}`,
+        title: lndr.t('[[res:bot.help.h1]]'),
+        description: `${lndr.t('[[res:bot.help.h2]]')}\n${lndr.dummy}`,
         color: 0xffe2ec,
       });
       const helpSections = Object.keys(helpStructure);
@@ -149,8 +154,8 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
           false,
         );
       });
-      lndr.helpEmbed.addField(lndr.dummy, lndr.t('bot.help.footer'));
-      lndr.helpEmbed.setFooter(lndr.t('bot.help.message'));
+      lndr.helpEmbed.addField(lndr.dummy, lndr.t('[[res:bot.help.footer]]'));
+      lndr.helpEmbed.setFooter(lndr.t('[[res:bot.help.message]]'));
       core.log.info('불러온 명령어로부터 도움말 메시지를 생성하였습니다.');
     })
   // Turn on DISCORD, start processing messages
@@ -172,6 +177,11 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
 
       // Prepare for message handling
       lndr.cli.on('message', (msg: DISCORD.Message) => {
+        // Ignore if is from bot
+        if (msg.author.bot) {
+          return;
+        }
+
         // Check serverlock
         if (lndr.config.serverlock) {
           if (msg.guild && !(lndr.config.serverlock.includes(msg.guild.id))) {
@@ -270,8 +280,13 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
                     ) return;
 
                     // Process command
-                    const tempLndr = { ...lndr };
-                    fn(core, tempLndr, pmsg);
+                    const tempLndr: LNDR = {
+                      ...lndr,
+                      version: core.config.version,
+                      log: core.log,
+                      util: core.util,
+                    };
+                    fn(tempLndr, acts, pmsg);
                     presence.ping(core, lndr);
                   }
                 }

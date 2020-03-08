@@ -16,7 +16,7 @@ core.init.then(() => {
         let lndrConf;
         try {
           lndrConf = yml.safeLoad(
-            fs.readFileSync(core.config.dir.data(['config.yml']), 'utf8'),
+            fs.readFileSync(core.config.dir.res(['config.yml']), 'utf8'),
           );
         } catch (e) {
           core.err.parse('설정 파일을 불러올 수 없습니다.')(e);

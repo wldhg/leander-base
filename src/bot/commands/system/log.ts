@@ -15,11 +15,13 @@ export const help: LNDRCommandHelp = {
   title: '🎫  로그',
 };
 
-export const fn: LNDRCommandFunction = (core, lndr, msg) => {
-  core.log.debug(util.inspect(msg));
-  const logMessage = lndr.embed.create(
+export const deps: LNDRCommandDeps = ['embed'];
+
+export const fn: LNDRCommandFunction = (lndr, acts, msg) => {
+  lndr.log.debug(util.inspect(msg));
+  const logMessage = acts.embed.create(
     '🎫  **기록 성공!**',
-    lndr.t('system.log.success', core.log.i.toString()),
+    lndr.t('[[res:system.log.success]]', lndr.log.i.toString()),
     0xbcbcbc,
   );
   msg.send(logMessage);

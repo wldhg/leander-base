@@ -10,17 +10,17 @@ const isCharSep = (char): boolean => char === '/' || char === '\\';
 
 /**
  * Creates directories upon {basePath}.
- * If {newDirPath} is empty, just create {baseDirPath}.
+ * If {newPath} is empty, just create {basePath}.
  */
 export default (basePath, newPath = ''): Promise<string> => {
   /* Regulate Variables */
   let baseDir = `${basePath}`;
   let newDir = `${newPath}`;
-  // {baseDirPath} must have separators on its end
+  // {basePath} must have separators on its end
   if (!isCharSep(baseDir[baseDir.length - 1])) {
     baseDir += path.sep;
   }
-  // {newDirPath} should not have separators on its start and end
+  // {newPath} should not have separators on its start and end
   if (isCharSep(newDir)) {
     newDir = newDir.substring(1);
   }

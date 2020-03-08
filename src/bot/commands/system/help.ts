@@ -9,20 +9,12 @@ export const meta: LNDRCommandMeta = {
 
 export const help: LNDRCommandHelp = {
   title: '🤷‍  도움말',
-  description: 't:system.help.help',
+  description: '[[res:system.help.help]]',
 };
 
-export const fn: LNDRCommandFunction = (core, lndr, msg) => {
-  const translate = (sentence: string): string => {
-    let translated = '';
-    if (sentence.indexOf('t:') === 0) {
-      translated = lndr.t(sentence.substring(2));
-    } else {
-      translated = core.util.format(sentence, lndr.tDict);
-    }
-    return translated;
-  };
+export const deps: LNDRCommandDeps = ['embed'];
 
+export const fn: LNDRCommandFunction = (lndr, acts, msg) => {
   if (msg.arguments.length === 0) {
     msg.send(lndr.helpEmbed);
   } else {
@@ -33,14 +25,14 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
 
     if (helpContent) {
       // Put content to the embed
-      const helpEmbed = lndr.embed.create(translate(helpContent.title));
+      const helpEmbed = acts.embed.create(lndr.t(helpContent.title));
 
       let needsServerAdminPermission = false;
       let needsLndrAdminPermission = false;
 
       if (helpContent.description || helpContent.fields) {
         if (helpContent.description) {
-          helpEmbed.setDescription(`${translate(helpContent.description)}\n${lndr.dummy}`);
+          helpEmbed.setDescription(`${lndr.t(helpContent.description)}\n${lndr.dummy}`);
         } else {
           helpEmbed.setDescription(lndr.dummy);
         }
@@ -49,12 +41,12 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
         if (helpContent.fields) {
           Object.keys(helpContent.fields).forEach((title) => {
             // Get title
-            let fieldTitle = title.length > 0 ? `${translate(title)} ` : `${lndr.dummy} `;
+            let fieldTitle = title.length > 0 ? `${lndr.t(title)} ` : `${lndr.dummy} `;
             if (
               helpContent.forServerAdmin instanceof Array
               && helpContent.forServerAdmin.includes(title)
             ) {
-              fieldTitle += '👑';
+              fieldTitle += '<:perm_crown:686271699540377735>';
               needsServerAdminPermission = true;
             }
             if (
@@ -64,56 +56,56 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
               fieldTitle += '🔧';
               needsLndrAdminPermission = true;
             }
-            fieldTitle = core.util.format(fieldTitle, lndr.tDict);
+            fieldTitle = lndr.util.format(fieldTitle, lndr.tDict);
 
             // Get body
-            const fieldBody = `${translate(helpContent.fields[title])}\n${lndr.dummy}`;
+            const fieldBody = `${lndr.t(helpContent.fields[title])}\n${lndr.dummy}`;
 
             // Go, field!
             helpEmbed.addField(fieldTitle, fieldBody, true);
           });
         }
       } else {
-        helpEmbed.setDescription(`${lndr.t('system.help.no_content')}\n${lndr.dummy}`);
+        helpEmbed.setDescription(`${lndr.t('[[res:system.help.no_content]]')}\n${lndr.dummy}`);
       }
 
       // Put permission message
       if (metaContent) {
         let permissionMessage = '';
         if (metaContent.conditions.DM === true) {
-          permissionMessage += `${lndr.t('system.help.only_dm')}\n`;
+          permissionMessage += `${lndr.t('[[res:system.help.only_dm]]')}\n`;
         } else if (metaContent.conditions.DM === false) {
-          permissionMessage += `${lndr.t('system.help.not_dm')}\n`;
+          permissionMessage += `${lndr.t('[[res:system.help.not_dm]]')}\n`;
         }
         if (metaContent.conditions.lndrAdmin === true) {
-          permissionMessage += `${lndr.t('system.help.only_lndrAdmin')}\n`;
+          permissionMessage += `${lndr.t('[[res:system.help.only_lndrAdmin]]')}\n`;
         }
         if (metaContent.conditions.guildAdmin === true) {
-          permissionMessage += `${lndr.t('system.help.only_guildAdmin')}\n`;
+          permissionMessage += `${lndr.t('[[res:system.help.only_guildAdmin]]')}\n`;
         }
         if (
           metaContent.conditions.author
           && metaContent.conditions.author.length > 0
         ) {
-          permissionMessage += `${lndr.t('system.help.some_author')}\n`;
+          permissionMessage += `${lndr.t('[[res:system.help.some_author]]')}\n`;
         }
         if (
           metaContent.conditions.channel
           && metaContent.conditions.channel.length > 0
         ) {
-          permissionMessage += `${lndr.t('system.help.some_channel')}\n`;
+          permissionMessage += `${lndr.t('[[res:system.help.some_channel]]')}\n`;
         }
         if (
           metaContent.conditions.guild
           && metaContent.conditions.guild.length > 0
         ) {
-          permissionMessage += `${lndr.t('system.help.some_guild')}\n`;
+          permissionMessage += `${lndr.t('[[res:system.help.some_guild]]')}\n`;
         }
         if (needsServerAdminPermission) {
-          permissionMessage += `👑 : ${lndr.t('system.help.need_guildAdmin')}\n`;
+          permissionMessage += `<:perm_crown:686271699540377735> : ${lndr.t('[[res:system.help.need_guildAdmin]]')}\n`;
         }
         if (needsLndrAdminPermission) {
-          permissionMessage += `🔧 : ${lndr.t('system.help.need_lndrAdmin')}\n`;
+          permissionMessage += `🔧 : ${lndr.t('[[res:system.help.need_lndrAdmin]]')}\n`;
         }
         if (permissionMessage.length > 0) {
           helpEmbed.addField('**─**', `${permissionMessage.trim()}`);
@@ -125,7 +117,7 @@ export const fn: LNDRCommandFunction = (core, lndr, msg) => {
       helpEmbed.setFooter(`${metaContent.section === null ? '알 수 없음' : metaContent.section} > ${command}`);
       msg.send(helpEmbed);
     } else {
-      msg.send(lndr.t('system.help.no_command', command));
+      msg.send(lndr.t('[[res:system.help.no_command]]', command));
     }
   }
 };

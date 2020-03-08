@@ -4,13 +4,16 @@
 import * as DISCORD from 'discord.js';
 import { MessageType } from '../message';
 
+type DialogCallback = (omsg: DISCORD.Message, nmsg: DISCORD.Message, timeout: number) => void;
+type DialogTimeoutCallback = (omsg: DISCORD.Message, timeout: number) => void;
+
 class Dialog implements LNDRModule {
   public name = 'dialog';
 
   public acts = {
     isOn: (msg): boolean => Boolean(this.contextInUse[this.getContextID(msg)]),
-    start: (msg, answerCallback,
-      timeout = 30, timeoutCallback = (): void => {}): void => {
+    start: (msg, answerCallback: DialogCallback,
+      timeoutInSeconds = 30, timeoutCallback: DialogTimeoutCallback = (): void => {}): void => {
       // Get CID
       const cid = this.getContextID(msg);
 
@@ -18,30 +21,32 @@ class Dialog implements LNDRModule {
       if (
         typeof answerCallback !== 'function'
           || !(msg instanceof DISCORD.Message)
-          || typeof timeout !== 'number'
+          || typeof timeoutInSeconds !== 'number'
           || typeof timeoutCallback !== 'function'
           || this.contextInUse[cid]
       ) {
         // Unsufficient arguments
         if (msg instanceof DISCORD.Message) {
-          msg.channel.send(`**❌ ${this.lndr.t('module.dialog.init_fail')} (lid:${this.core.log.i})**`);
+          msg.channel.send(`**❌ ${this.lndr.t('[[res:module.dialog.init_fail]]')} (lid:${this.core.log.i})**`);
           this.core.log.error('context::startConversation - 메시지가 없는 유효하지 않은 값입니다.');
           this.core.log.debug(msg, 'msg');
         } else {
           this.core.log.error('context::startConversation - 메시지가 있는 유효하지 않은 값입니다.');
         }
         this.core.log.debug(answerCallback, 'answerCallback');
-        this.core.log.debug(timeout, 'timeout');
+        this.core.log.debug(timeoutInSeconds, 'timeout');
         this.core.log.debug(timeoutCallback, 'timeoutCallback');
         this.core.log.debug(cid, 'cid');
       } else {
         // Sufficient arguments
-        const timeoutID = this.startConversationTimeout(msg, timeout, cid, timeoutCallback);
+        const timeoutID = this.startConversationTimeout(
+          msg, timeoutInSeconds, cid, timeoutCallback,
+        );
         this.contextInUse[cid] = {
           cid,
           origMsg: msg,
           answerCallback,
-          timeout,
+          timeout: timeoutInSeconds,
           timeoutCallback,
           timeoutID,
         };
@@ -64,15 +69,19 @@ class Dialog implements LNDRModule {
     },
   ];
 
-  public init = (core: AppCore, lndr: LNDR): Promise<void> => new Promise((resolve) => {
+  public init = (core: AppCore, lndr: LNDRBase, deps: LNDRModuleDep):
+  Promise<void> => new Promise((resolve) => {
     this.core = core;
     this.lndr = lndr;
+    this.tools = deps.tools.acts;
     resolve();
   });
 
+  private tools: LNDRModuleActs;
+
   private core: AppCore;
 
-  private lndr: LNDR;
+  private lndr: LNDRBase;
 
   private contextInUse = {};
 
@@ -85,7 +94,7 @@ class Dialog implements LNDRModule {
       cid += `${msg.channel.id}:${msg.author.id}`;
     } else {
       if (msg instanceof DISCORD.Message) {
-        msg.channel.send(`**❌ ${this.lndr.t('module.dialog.code_fail')} (lid:${this.core.log.i})**`);
+        msg.channel.send(`**❌ ${this.lndr.t('[[res:module.dialog.code_fail]]')} (lid:${this.core.log.i})**`);
       }
       this.core.log('context::getContextID - 예상하지 못한 메시지 종류입니다.');
       this.core.log.debug(msg);
@@ -99,7 +108,7 @@ class Dialog implements LNDRModule {
   private startConversationTimeout = (msg, timeout, cid,
     timeoutCallback): NodeJS.Timeout => setTimeout(
     () => {
-      msg.channel.send(this.lndr.t('module.dialog.close', this.lndr.tools.mention(msg.author), String(timeout)));
+      msg.channel.send(this.lndr.t('[[res:module.dialog.close]]', this.tools.mention(msg.author), String(timeout)));
       delete this.contextInUse[cid];
       this.lndr.serverlock.removeException(msg.author.id);
       timeoutCallback(msg, timeout);
@@ -129,8 +138,8 @@ class Dialog implements LNDRModule {
         this.contextInUse[context.cid].timeoutID = this.startConversationTimeout(
           msg, context.timeout, context.cid, context.timeoutCallback,
         );
-        msg.channel.send(`**❌ ${this.lndr.t('module.dialog.chk_fail')} (lid:${this.core.log.i})**`);
-        msg.channel.send(this.lndr.t('module.dialog.chk_log', context.timeout, randomErrorCode.toString(16), this.lndr.tools.mention(this.lndr.config.discord.adminID)));
+        msg.channel.send(`**❌ ${this.lndr.t('[[res:module.dialog.chk_fail]]')} (lid:${this.core.log.i})**`);
+        msg.channel.send(this.lndr.t('[[res:module.dialog.chk_log]]', context.timeout, randomErrorCode.toString(16), this.tools.mention(this.lndr.config.discord.adminID)));
         this.core.log.error(`context::continueConversation - 콜백 오류 (0x${randomErrorCode.toString(16)}).`);
         this.core.log.debug(callbackErr);
       }
@@ -140,3 +149,4 @@ class Dialog implements LNDRModule {
 }
 
 export default Dialog;
+export const deps = ['tools'];

@@ -16,16 +16,16 @@ class Web implements LNDRModule {
     getURL: (code): string => {
       let url = '';
 
-      if (this.lndr.domain.tls) {
+      if (this.lndr.config.web.tls) {
         url += 'https://';
       } else {
         url += 'http://';
       }
 
-      url += this.lndr.domain.name;
+      url += this.lndr.config.web.domain;
 
-      if (this.lndr.domain.port) {
-        url += `:${this.lndr.domain.port}`;
+      if (this.lndr.config.web.port) {
+        url += `:${this.lndr.config.web.port}`;
       }
 
       url += `/${code}`;
@@ -107,7 +107,7 @@ class Web implements LNDRModule {
     },
   };
 
-  public init = (core: AppCore, lndr: LNDR): Promise<void> => new Promise((resolve, reject) => {
+  public init = (core: AppCore, lndr: LNDRBase): Promise<void> => new Promise((resolve, reject) => {
     this.core = core;
     this.lndr = lndr;
 
@@ -169,20 +169,20 @@ class Web implements LNDRModule {
     });
 
     // Config Koa
-    if (lndr.domain.tls) {
+    if (lndr.config.web.tls) {
       https.createServer(
         {
           key: fs.readFileSync(
-            path.join('.', 'data', lndr.domain.tls.key),
+            path.join('.', 'data', lndr.config.web.tls.key),
           ),
           cert: fs.readFileSync(
-            path.join('.', 'data', lndr.domain.tls.cert),
+            path.join('.', 'data', lndr.config.web.tls.cert),
           ),
         },
         this.app.callback(),
-      ).listen(lndr.domain.port ? lndr.domain.port : 443);
+      ).listen(lndr.config.web.port ? lndr.config.web.port : 443);
 
-      if (!lndr.domain.port || lndr.domain.port === 443) {
+      if (!lndr.config.web.port || lndr.config.web.port === 443) {
         const redirectApp = new Koa();
         const redirectRouter = new Router();
         redirectRouter.all(':', (ctx) => {
@@ -195,7 +195,7 @@ class Web implements LNDRModule {
       }
     } else {
       http.createServer(this.app.callback())
-        .listen(lndr.domain.port ? lndr.domain.port : 80);
+        .listen(lndr.config.web.port ? lndr.config.web.port : 80);
     }
     this.app.on('error', core.err.parse('Failed to process routing on Koa.'));
     this.app.use(this.router.routes());
@@ -206,7 +206,7 @@ class Web implements LNDRModule {
 
   private core: AppCore;
 
-  private lndr: LNDR;
+  private lndr: LNDRBase;
 
   private app: Koa;
 

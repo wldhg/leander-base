@@ -9,22 +9,24 @@ export const meta: LNDRCommandMeta = {
 
 export const help: LNDRCommandHelp = {
   title: '📧  초대하기',
-  description: 't:system.invite.help',
+  description: '[[res:system.invite.help]]',
 };
 
-export const fn: LNDRCommandFunction = (core, lndr, msg) => {
+export const deps: LNDRCommandDeps = ['embed', 'tools'];
+
+export const fn: LNDRCommandFunction = (lndr, acts, msg) => {
   if (lndr.config.discord.invitable) {
-    const inviteEmbed = lndr.embed.create(
-      lndr.t('system.invite.h1'),
-      `${lndr.t('system.invite.h2')}\n${lndr.dummy}`,
+    const inviteEmbed = acts.embed.create(
+      lndr.t('[[res:system.invite.h1]]'),
+      `${lndr.t('[[res:system.invite.h2]]')}\n${lndr.dummy}`,
       {
         title: '초대 링크',
         body: `https://discordapp.com/oauth2/authorize?client_id=${lndr.config.discord.clientID}&scope=bot&permissions=${lndr.config.discord.permission}\n${lndr.dummy}`,
       },
-      lndr.t('system.invite.h3'),
+      lndr.t('[[res:system.invite.h3]]'),
     );
     msg.send(inviteEmbed);
   } else {
-    msg.send(lndr.t('system.invite.denied', lndr.tools.mention(lndr.config.discord.adminID)));
+    msg.send(lndr.t('[[res:system.invite.denied]]', acts.tools.mention(lndr.config.discord.adminID)));
   }
 };

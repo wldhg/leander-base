@@ -25,7 +25,7 @@ const changePresence = (): void => {
   recentPresenceIndex = newPresenceIndex;
 };
 
-export const off = (core: AppCore, lndr: LNDR): Promise<DISCORD.Presence | null> => {
+export const off = (core: AppCore, lndr: LNDRBase): Promise<DISCORD.Presence | null> => {
   let prom = Promise.resolve(null);
   if (lndr.cli && lndr.cli.user) {
     // Clear presence changements first
@@ -41,7 +41,7 @@ export const off = (core: AppCore, lndr: LNDR): Promise<DISCORD.Presence | null>
   return prom;
 };
 
-export const idle = (core: AppCore, lndr: LNDR): Promise<DISCORD.Presence | null> => {
+export const idle = (core: AppCore, lndr: LNDRBase): Promise<DISCORD.Presence | null> => {
   let prom = Promise.resolve(null);
   if (lndr.cli && lndr.cli.user) {
     prom = lndr.cli.user.setStatus('idle');
@@ -50,7 +50,7 @@ export const idle = (core: AppCore, lndr: LNDR): Promise<DISCORD.Presence | null
   return prom;
 };
 
-export const on = (core: AppCore, lndr: LNDR): Promise<DISCORD.Presence | null> => {
+export const on = (core: AppCore, lndr: LNDRBase): Promise<DISCORD.Presence | null> => {
   let prom = Promise.resolve(null);
   if (lndr.cli && lndr.cli.user) {
     prom = lndr.cli.user.setStatus('online');
@@ -59,7 +59,7 @@ export const on = (core: AppCore, lndr: LNDR): Promise<DISCORD.Presence | null> 
   return prom;
 };
 
-export const ping = (core: AppCore, lndr: LNDR): void => {
+export const ping = (core: AppCore, lndr: LNDRBase): void => {
   clearTimeout(idleTimeoutNo);
   on(core, lndr);
   idleTimeoutNo = setTimeout(() => {
@@ -67,7 +67,7 @@ export const ping = (core: AppCore, lndr: LNDR): void => {
   }, 20000);
 };
 
-export const init = (core: AppCore, lndr: LNDR): Promise<void> => new Promise((resolve) => {
+export const init = (core: AppCore, lndr: LNDRBase): Promise<void> => new Promise((resolve) => {
   lndr.cli.user.setPresence({
     activity: {
       name: `🎇 lndr ${core.config.version} init...`,

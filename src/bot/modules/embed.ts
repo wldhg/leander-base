@@ -5,7 +5,7 @@ import * as DISCORD from 'discord.js';
 
 type EmbedContentSection = {
   title: string;
-  content: string;
+  body: string;
 }
 type EmbedContent = number | string | EmbedContentSection[] | EmbedContentSection;
 
@@ -13,7 +13,8 @@ class Embed implements LNDRModule {
   public name = 'embed';
 
   public acts = {
-    create: (title: string, description: string, ...prop: EmbedContent[]): DISCORD.MessageEmbed => {
+    create: (title: string, description?: string, ...prop: EmbedContent[]):
+    DISCORD.MessageEmbed => {
       // Ingredients
       const sections = [];
       let color = 0xff96a9;
@@ -64,7 +65,7 @@ class Embed implements LNDRModule {
     },
   };
 
-  public init = (core: AppCore, lndr: LNDR): Promise<void> => new Promise((resolve) => {
+  public init = (core: AppCore, lndr: LNDRBase): Promise<void> => new Promise((resolve) => {
     this.core = core;
     this.lndr = lndr;
     resolve();
@@ -72,7 +73,7 @@ class Embed implements LNDRModule {
 
   public core: AppCore;
 
-  public lndr: LNDR;
+  public lndr: LNDRBase;
 }
 
 export default Embed;

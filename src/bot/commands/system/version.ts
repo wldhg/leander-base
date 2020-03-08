@@ -9,9 +9,11 @@ export const meta: LNDRCommandMeta = {
 
 export const help: LNDRCommandHelp = {
   title: '[[bot:emoji]]  버전 정보',
-  description: 't:system.version.help',
+  description: '[[res:system.version.help]]',
 };
 
-export const fn: LNDRCommandFunction = (core, lndr, msg) => {
-  msg.raw.channel.send(lndr.t('system.version.info', core.config.version));
+export const deps: LNDRCommandDeps = [];
+
+export const fn: LNDRCommandFunction = (lndr, acts, msg) => {
+  msg.send(lndr.t('[[res:system.version.info]]', lndr.version));
 };

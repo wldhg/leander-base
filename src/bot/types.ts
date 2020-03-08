@@ -3,9 +3,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-type LNDRModuleNames = 'dialog' | 'tools' | 'embed';
-
-type LNDR = {
+type LNDRBase = {
   config: LNDRConfig;
   cli: import('discord.js').Client;
   serverlock: {
@@ -31,7 +29,12 @@ type LNDR = {
     [key: string]: LNDRCommandMeta;
   };
   helpEmbed?: import('discord.js').MessageEmbed;
-  [key: string]: LNDRModuleActs | any;
+}
+
+interface LNDR extends LNDRBase {
+  log: AppCoreLogFunction;
+  version: string;
+  util: AppCoreUtil;
 }
 
 interface LNDRConfig {
@@ -73,7 +76,7 @@ type LNDRPresence = string | LNDRActivity;
 
 interface LNDRModule {
   name: string;
-  init: (core: AppCore, lndr: LNDR, deps?: LNDRModuleDep) => Promise<void>;
+  init: (core: AppCore, lndr: LNDRBase, deps?: LNDRModuleDep) => Promise<void>;
   acts?: LNDRModuleActs;
   hooks?: LNDRModuleHook[];
 }
@@ -121,12 +124,15 @@ interface LNDRCommandHelp {
   forLndrAdmin?: string[];
 }
 
-type LNDRCommandFunction = (core: AppCore, lndr: LNDR, msg: LNDRParsedMessage) => void;
+type LNDRCommandFunction = (lndr: LNDR, acts: LNDRActs, msg: LNDRParsedMessage) => void;
+
+type LNDRCommandDeps = string[];
 
 interface LNDRCommand {
   meta: LNDRCommandMeta;
   help: LNDRCommandHelp;
   fn: LNDRCommandFunction;
+  deps: LNDRCommandDeps;
 }
 
 type LNDRTranslateFunction = (sentence: string, ...args: string[]) => string;

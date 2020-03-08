@@ -1,6 +1,6 @@
 {
   "name": "leander-base",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "디스코드 커뮤니티 서버용 봇 베이스, 리엔더",
   "main": "./src/lndr.ts",
   "repository": "https://github.com/wldh-g/leander-base.git",
@@ -32,11 +32,13 @@
     "webpack": "^4.42.0"
   },
   "dependencies": {
+    "@types/lowdb": "^1.0.9",
     "colors": "^1.4.0",
     "discord.js": "^12.0.1",
     "js-yaml": "^3.13.1",
     "koa": "^2.11.0",
     "koa-router": "^8.0.8",
+    "lowdb": "^1.0.0",
     "markdown-it": "^10.0.0",
     "mime-types": "^2.1.26",
     "moment": "^2.24.0",

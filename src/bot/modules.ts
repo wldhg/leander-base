@@ -4,23 +4,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const preservedNames = [
-  'config', 'cli', 'commands', 'modules', 'dummy', 't', 'fn', 'help', 'meta', 'helpEmbed',
-];
-
 const loadAModule = (core, lndr, modulePath, newModule, deps, callback): void => {
   if (newModule && newModule.init && newModule.name) {
-    if (preservedNames.includes(newModule.name)) {
-      core.log.error(`이 모듈 이름은 사용할 수 없습니다. 모듈을 불러오지 않습니다: ${newModule.name}`);
+    newModule.init(core, lndr, deps).then(() => {
+      callback(newModule);
+    }, (initErr) => {
+      core.err.parse('모듈이 하나 로드되지 않았습니다. 무시하고 계속합니다.', 'silent')(initErr);
       callback();
-    } else {
-      newModule.init(core, lndr, deps).then(() => {
-        callback(newModule);
-      }, (initErr) => {
-        core.err.parse('모듈이 하나 로드되지 않았습니다. 무시하고 계속합니다.', 'silent')(initErr);
-        callback();
-      });
-    }
+    });
   } else {
     core.log.warn(`이 파일은 올바른 모듈이 아닙니다. 무시하고 계속합니다: ${modulePath}`);
     callback();
@@ -45,33 +36,38 @@ const loadPartial = (core, lndr, target): Promise<[LNDRModule[], LNDRModuleDepNo
               resolveModule();
             });
           } else if (lstat.isFile()) {
-            const targetPath = path.normalize(`../../${fullPath}`).replace(/\\/g, '/');
-            import(targetPath).then((loadedModule) => {
-              const LoadedModule = loadedModule.default;
-              const LoadedModuleDependencies = loadedModule.deps || loadedModule.dependencies;
-              const newModule = new LoadedModule();
-              if (LoadedModuleDependencies?.length > 0) {
-                // Add to dependency waiting list
-                notLoadedModules.push({
-                  module: newModule,
-                  deps: LoadedModuleDependencies,
-                  path: fullPath,
-                });
-                resolveModule();
-              } else {
-                // Load and add to module list
-                loadAModule(core, lndr, fullPath, newModule, {}, (mod) => {
-                  if (mod) {
-                    modules.push(mod);
-                  }
-                  resolveModule();
-                });
-              }
-            }).catch((error) => {
-              core.err.parse(`모듈을 읽을 수 없습니다: ${item}`, 'silent')(error);
-              core.log.warn(`파일을 무시하고 계속합니다: ${fullPath}`);
+            if (item === 'types.ts') {
+              // Ignore type definition file
               resolveModule();
-            });
+            } else {
+              const targetPath = path.normalize(`../../${fullPath}`).replace(/\\/g, '/');
+              import(targetPath).then((loadedModule) => {
+                const LoadedModule = loadedModule.default;
+                const LoadedModuleDependencies = loadedModule.deps || loadedModule.dependencies;
+                const newModule = new LoadedModule();
+                if (LoadedModuleDependencies?.length > 0) {
+                  // Add to dependency waiting list
+                  notLoadedModules.push({
+                    module: newModule,
+                    deps: LoadedModuleDependencies,
+                    path: fullPath,
+                  });
+                  resolveModule();
+                } else {
+                  // Load and add to module list
+                  loadAModule(core, lndr, fullPath, newModule, {}, (mod) => {
+                    if (mod) {
+                      modules.push(mod);
+                    }
+                    resolveModule();
+                  });
+                }
+              }).catch((error) => {
+                core.err.parse(`모듈을 읽을 수 없습니다: ${item}`, 'silent')(error);
+                core.log.warn(`파일을 무시하고 계속합니다: ${fullPath}`);
+                resolveModule();
+              });
+            }
           } else {
             core.log.warn(`${fullPath} 은 파일 혹은 디렉토리가 아닙니다. 무시하고 계속합니다.`);
           }

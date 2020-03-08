@@ -46,7 +46,10 @@ run/*
 
 # Bot Data
 data/**/*
-!data/config.example.yml
+
+# Published configs in base
+res/*
+!res/config.example.yml
 
 # Published language sets in base
 res/lang/**/*

@@ -7,21 +7,32 @@ class Tools implements LNDRModule {
   public name = 'tools';
 
   public acts = {
+    getMember: (guild: DISCORD.Guild, memberLike: string): DISCORD.GuildMember => {
+      let member;
+      if (memberLike.indexOf('<@!') === 0) {
+        member = guild.member(memberLike.substring(3, memberLike.length - 1));
+      } else {
+        member = guild.member(memberLike);
+      }
+      return member;
+    },
+
     from: (obj): string => {
       let name;
       if (obj instanceof DISCORD.User) {
         name = obj.username;
       } else if (obj instanceof DISCORD.GuildMember) {
         name = obj.nickname || obj.user.username;
-      } else if (obj instanceof DISCORD.Message) {
-        if (obj.member) {
-          name = obj.member.nickname || obj.author.username;
-        } else {
-          name = obj.author.username;
-        }
+      } else if (obj.member) {
+        name = obj.member.nickname || obj.author.username;
+      } else if (obj.author) {
+        name = obj.author.username;
+      } else {
+        name = 'Unknown';
       }
       return name;
     },
+
     isURL: (urlLike): boolean => {
       try {
         // eslint-disable-next-line no-new
@@ -31,11 +42,12 @@ class Tools implements LNDRModule {
         return false;
       }
     },
+
     mention: (obj): string => {
       let user;
       if (obj instanceof DISCORD.User) {
         user = obj;
-      } else if (obj instanceof DISCORD.Message) {
+      } else if (obj instanceof DISCORD.Message || obj.author) {
         user = obj.author;
       } else if (typeof obj === 'string') {
         user = { id: obj };
@@ -47,7 +59,7 @@ class Tools implements LNDRModule {
     },
   };
 
-  public init = (core: AppCore, lndr: LNDR): Promise<void> => new Promise((resolve) => {
+  public init = (core: AppCore, lndr: LNDRBase): Promise<void> => new Promise((resolve) => {
     this.core = core;
     this.lndr = lndr;
     resolve();
@@ -55,7 +67,7 @@ class Tools implements LNDRModule {
 
   private core: AppCore;
 
-  private lndr: LNDR;
+  private lndr: LNDRBase;
 }
 
 export default Tools;
