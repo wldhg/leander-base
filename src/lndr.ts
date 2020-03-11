@@ -23,7 +23,13 @@ core.init.then(() => {
         }
         return [bot, lndrConf];
       }).then(([bot, lndrConf]) => {
-        bot.wakeUp(core, lndrConf);
+        try {
+          bot.wakeUp(core, lndrConf);
+        } catch (e) {
+          core.log.error('봇 구동 중 알 수 없는 오류가 발생하였습니다.');
+          core.log.debug(e);
+          core.exit(1);
+        }
       });
       break;
     }

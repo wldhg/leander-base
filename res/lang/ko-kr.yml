@@ -13,7 +13,7 @@ module:
     init_fail: '대화 모듈 초기화 중 오류가 발생했어요.'
     chk_fail: '대답을 확인하던 중 오류가 발생했어요.'
     chk_log: '대답을 이해하지는 못했지만 왜 이해하지 못했는지 내부 기록을 남겼어요.\n반복해서 오류가 발생하면 응답 시간(`[[0]]`초) 초과를 기다린 다음, 오류 코드 `0x[[1]]`을 [[2]]님께 알려주세요.\n불편을 끼쳐드려 죄송해요, [[bot:addressing]]님.'
-    close: '[[0]] [[bot.addressing]]님, `[[1]]`초 간 응답이 없어 대화를 종료할게요.'
+    close: '[[0]] [[bot:addressing]]님, `[[1]]`초 간 응답이 없어 대화를 종료할게요.'
 
 
 #####################
@@ -52,21 +52,36 @@ system:
     success: '[[bot:addressing]]님, 보내신 메시지가 `[[0]]` 번 로그에 저장되었어요.'
   chkperm:
     info: '[[0]] [[bot:addressing]]님의 권한은 아래와 같아요.\n개발에 도움이 되시길 바랄게요, [[bot:addressing]]님!'
+  chkdeps:
+    info: '현재 리엔더 `v[[0]]`는 총 [[1]]개의 패키지에 의존하여 실행되고 있으며 [[2]]개의 패키지에 의존하여 개발되고 있어요.'
 
 guild:
   point:
     help: '이 디스코드 서버에서 [[bot:addressing]]님의 포인트를 보여드려요.'
     see_mine: '`[[bot:prefix]]포인트`를 입력하면 [[bot:addressing]]님의 포인트를 볼 수 있어요.'
     see_others: '`[[bot:prefix]]포인트 (@멤버/ID)`를 입력하면 다른 멤버의 포인트를 볼 수 있어요.'
-    change: '`[[bot:prefix]]포인트 [+-]양 (@멤버/ID) [@멤버/ID...]`를 입력하면 다른 멤버(들)의 포인트를 변경할 수 있어요.'
+    change: '`[[bot:prefix]]포인트 [+-]양 (@멤버/역할/ID) [@멤버/역할/ID...]`를 입력하면 다른 멤버(들)의 포인트를 변경할 수 있어요.'
     no_perm: '서버 관리자만이 다른 분의 포인트를 관리할 수 있어요.'
     invalid_amount: '포인트 수량 지정이 잘못되었어요. 다시 한 번 확인해주시겠어요?'
     change_confirm: '[[0]] [[bot:addressing]]님의 포인트를 [[1]]만큼 [[2]]하려고 해요.\n"[[3]]" 또는 [[2]] 사유를 말씀해주세요.'
     change_cancel: '포인트 [[0]]을 취소했어요.'
-    change_fail_negative: '변경 이후 [[0]] [[bot:addressing]]님의 포인트가 음수가 되어 변경할 수 없었어요. 다시 한 번 확인해주세요.'
+    change_fail_negative: '[[0]] [[bot:addressing]]님의 사용 이후 포인트가 음수가 되어 변경할 수 없었어요. 다시 한 번 확인해주세요.'
     change_fail_unknown: '[[0]] [[bot:addressing]]님의 포인트를 변경할 수 없었어요. 오류는 서버 내부에 기록했으니, 저를 관리해주시는 [[bot:addressing]]님께 말씀 부탁드릴게요!'
-    change_finished: '[[0]] 내용을 모두 처리했어요!'
-    change_timeout: '[[0]]초 동안 말이 없으셔서 [[1]]을 취소했어요.'
+    change_finished_success: '[[0]] 내용을 모두 처리했어요!'
+    change_finished_partial: '포인트를 변경할 수 있는 나머지 [[bot:addressing]]님들의 [[0]] 내역을 모두 처리했어요!'
+    change_finished_failed: '[[0]] 내용을 처리할 수 있는 [[bot:addressing]]님이 없었어요. 모든 포인트 내역은 그대로에요.'
     footer_link: '위 링크는 보안을 위해 1시간 뒤부터는 볼 수 없어요.'
     footer_contact: '적립 및 사용 기록은 저의 관리를 담당하시는 [[bot:addressing]]님께 물어봐주세요.'
     link: '위 링크에서 확인하실 수 있어요.'
+    invalid_member: '[[0]] [[bot:addressing]]님은 올바른 멤버 또는 역할이 아닌 것 같아요.'
+    query_only_one: '한 번에 한 분씩만 조회할 수 있어요.'
+    invalid_continue: '나머지 올바르게 입력된 멤버 목록으로 계속할게요.'
+    invalid_stop: '올바르게 입력된 멤버가 없어요.'
+    not_zero: '0 포인트로 어쩌라는 건가요? 쓸데없이 저장 공간을 낭비하지 말아주세요.'
+  rank:
+    help: '이 디스코드 서버에서의 포인트 랭킹을 알려드려요.'
+    greeting: '[[0]] 함께해주셔서 항상 감사해요. ♥'
+    my_known: '[[0]] [[bot:addressing]]님은 `[[1]]` 포인트로 현재 `[[2]]`위에요.'
+    my_unknown: '[[0]] [[bot:addressing]]님은 한 번도 포인트가 적립된 적이 없어서 순위 기록이 없어요.'
+    disp_limit: '전체 순위는 [[0]]위까지 표시하고 있어요.'
+    no_record: '이 서버에는 포인트가 있는 [[bot:addressing]]님이 없어요.'

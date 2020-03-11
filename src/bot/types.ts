@@ -6,6 +6,7 @@
 type LNDRBase = {
   config: LNDRConfig;
   cli: import('discord.js').Client;
+  pkg: AppConfig;
   serverlock: {
     isException: (id: import('discord.js').Snowflake) => boolean;
     addException: (id: import('discord.js').Snowflake) => void;
@@ -47,17 +48,31 @@ interface LNDRConfig {
   };
   serverlock?: import('discord.js').Snowflake[];
   web?: {
-    domain: string;
-    port?: number;
-    tls?: {
-      key: string;
-      cert: string;
+    frontend: {
+      domain?: string;
+      port: number;
+      https?: false;
+    };
+    backend: {
+      domain: string;
+      port?: number;
+      tls?: {
+        privkey: string;
+        fullchain: string;
+      };
     };
   };
   prefix: string;
   presence?: {
-    interval: number;
-    list: LNDRPresence[];
+    timeout: number;
+    active: {
+      interval: number;
+      list: LNDRPresence[];
+    };
+    rest?: {
+      interval: number;
+      list: LNDRPresence[];
+    };
   };
   lang: 'ko-kr' | string;
   addressing: string;
@@ -101,8 +116,10 @@ interface LNDRModuleDep {
   [key: string]: LNDRModule;
 }
 
+type LNDRCommandSection = '커뮤니티' | '기타';
+
 interface LNDRCommandMeta {
-  section: string | null;
+  section: LNDRCommandSection | null;
   commands: string[];
   conditions: {
     DM?: boolean;
@@ -149,6 +166,7 @@ interface LNDRParsedMessage {
       content?: import('discord.js').StringResolvable,
       options?: (import('discord.js').MessageOptions & { split: true | import('discord.js').SplitOptions }) | import('discord.js').MessageAdditions,
     ) => Promise<import('discord.js').Message[] | import('discord.js').Message>;
+  reply?: (content: string) => Promise<import('discord.js').Message>;
   channel?: import('discord.js').Channel;
   author?: import('discord.js').User;
   guild?: import('discord.js').Guild;

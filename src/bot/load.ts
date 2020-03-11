@@ -5,6 +5,7 @@ import './types';
 import './modules/types';
 
 import * as DISCORD from 'discord.js';
+import * as config from './config';
 import * as commander from './commands';
 import * as serverlock from './serverlock';
 import { checkPerm, MessageType, parseMessageText } from './message';
@@ -56,13 +57,14 @@ const procMessageHook = (core: AppCore, lndr: LNDRBase, msg: DISCORD.Message, ms
   return procRes;
 });
 
-export const wakeUp = (core: AppCore, lndrConf): void => {
+export const wakeUp = (core: AppCore, lndrConf: LNDRConfig): void => {
   const lndr: LNDRBase = {
     config: lndrConf,
     cli: new DISCORD.Client({
       retryLimit: 3,
       presence: { status: 'dnd' },
     }),
+    pkg: core.config,
     serverlock,
     dummy: '\u200B',
     t: translate.getT(core, lndrConf),
@@ -88,8 +90,10 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
     });
   }));
 
+  // Check LNDR Configuration
+  config.check(core, lndrConf)
   // Read leander modules
-  moduler.load(core, lndr)
+    .then(() => moduler.load(core, lndr))
   // Initialize leander modules, read leander commands
     .then((loadedModules) => {
       const moduleNames: string[] = [];
@@ -240,6 +244,9 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
                   pmsg.raw = msg;
                   pmsg.send = (data): Promise<DISCORD.Message | DISCORD.Message[]> => msg.channel
                     .send(data);
+                  pmsg.reply = (data): Promise<DISCORD.Message> => msg.channel.send(
+                    lndr.t(`${acts.tools.mention(msg.author)} [[bot:addressing]]님, ${data}`),
+                  );
                   pmsg.channel = msg.channel;
                   pmsg.author = msg.author;
                   pmsg.guild = msg.guild;
@@ -318,5 +325,15 @@ export const wakeUp = (core: AppCore, lndrConf): void => {
           msg.channel.stopTyping(true);
         }
       });
+    })
+  // Catch errors
+    .catch((err) => {
+      if (err === config.CONFIG_ERROR) {
+        core.log.error('리엔더 설정 파일이 올바르지 않아 봇 구동을 계속할 수 없습니다.');
+      } else {
+        core.log.error('리엔더 구동 중 오류가 발생했습니다. 봇 구동을 계속할 수 없습니다.');
+        core.log.debug(err);
+      }
+      core.exit(1);
     });
 };

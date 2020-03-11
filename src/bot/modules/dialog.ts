@@ -4,7 +4,7 @@
 import * as DISCORD from 'discord.js';
 import { MessageType } from '../message';
 
-type DialogCallback = (omsg: DISCORD.Message, nmsg: DISCORD.Message, timeout: number) => void;
+type DialogCallback = (omsg: DISCORD.Message, nmsg: DISCORD.Message, timeout: number) => boolean;
 type DialogTimeoutCallback = (omsg: DISCORD.Message, timeout: number) => void;
 
 class Dialog implements LNDRModule {
@@ -123,7 +123,6 @@ class Dialog implements LNDRModule {
       clearTimeout(context.timeoutID);
 
       // Start answering
-      msg.channel.startTyping();
       try {
         if (context.answerCallback(context.origMsg, msg, context.timeout)) {
           delete this.contextInUse[context.cid];
@@ -143,7 +142,6 @@ class Dialog implements LNDRModule {
         this.core.log.error(`context::continueConversation - 콜백 오류 (0x${randomErrorCode.toString(16)}).`);
         this.core.log.debug(callbackErr);
       }
-      msg.channel.stopTyping();
     }
   };
 }

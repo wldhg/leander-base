@@ -9,6 +9,10 @@ import * as http from 'http';
 import * as https from 'https';
 import * as mime from 'mime-types';
 
+// 단순히 API를 제공하는 것.
+// HOST 옵션이 켜져 있으면 호스트도 같이 해 주는 것.
+// 웹을 빌드하여 제출해주는 것.
+
 class Web implements LNDRModule {
   public name = 'web';
 
@@ -16,16 +20,21 @@ class Web implements LNDRModule {
     getURL: (code): string => {
       let url = '';
 
-      if (this.lndr.config.web.tls) {
+      if (this.lndr.config.web.backend.tls) {
         url += 'https://';
       } else {
         url += 'http://';
       }
 
-      url += this.lndr.config.web.domain;
+      url += this.lndr.config.web.backend.domain;
 
-      if (this.lndr.config.web.port) {
-        url += `:${this.lndr.config.web.port}`;
+      if (this.lndr.config.web.backend.port) {
+        if (
+          !(this.lndr.config.web.backend.tls && this.lndr.config.web.backend.port === 443)
+          && !(!this.lndr.config.web.backend.tls && this.lndr.config.web.backend.port === 80)
+        ) {
+          url += `:${this.lndr.config.web.backend.port}`;
+        }
       }
 
       url += `/${code}`;
@@ -116,7 +125,7 @@ class Web implements LNDRModule {
     if (!lndr.config.web) {
       reject(new Error('web::init - 웹 서비스를 사용하도록 설정되지 않았습니다.'));
       haveToExit = true;
-    } else if (!lndr.config.web.domain) {
+    } else if (!lndr.config.web.backend.domain) {
       reject(new Error('web::init - 웹 서비스를 위한 도메인이 설정되지 않았습니다.'));
       haveToExit = true;
     }
@@ -169,20 +178,20 @@ class Web implements LNDRModule {
     });
 
     // Config Koa
-    if (lndr.config.web.tls) {
+    if (lndr.config.web.backend.tls) {
       https.createServer(
         {
           key: fs.readFileSync(
-            path.join('.', 'data', lndr.config.web.tls.key),
+            path.join('.', 'data', lndr.config.web.backend.tls.privkey),
           ),
           cert: fs.readFileSync(
-            path.join('.', 'data', lndr.config.web.tls.cert),
+            path.join('.', 'data', lndr.config.web.backend.tls.fullchain),
           ),
         },
         this.app.callback(),
-      ).listen(lndr.config.web.port ? lndr.config.web.port : 443);
+      ).listen(lndr.config.web.backend.port ? lndr.config.web.backend.port : 443);
 
-      if (!lndr.config.web.port || lndr.config.web.port === 443) {
+      if (!lndr.config.web.backend.port || lndr.config.web.backend.port === 443) {
         const redirectApp = new Koa();
         const redirectRouter = new Router();
         redirectRouter.all(':', (ctx) => {
@@ -195,7 +204,7 @@ class Web implements LNDRModule {
       }
     } else {
       http.createServer(this.app.callback())
-        .listen(lndr.config.web.port ? lndr.config.web.port : 80);
+        .listen(lndr.config.web.backend.port ? lndr.config.web.backend.port : 80);
     }
     this.app.on('error', core.err.parse('Failed to process routing on Koa.'));
     this.app.use(this.router.routes());

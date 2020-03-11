@@ -19,7 +19,7 @@ import * as exitmgr from './exitmgr';
 import * as parserr from './parserr';
 import * as json from '../util/json';
 
-export const coreVersion = '1.1.5';
+export const coreVersion = '1.1.6';
 
 const logInstance = new Log();
 export function log(data, title): void {

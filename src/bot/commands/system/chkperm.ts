@@ -21,7 +21,7 @@ export const fn: LNDRCommandFunction = (lndr, acts, msg) => {
     lndr.t('[[res:system.chkperm.info]]', acts.tools.mention(msg)),
     {
       title: 'Serialized Permissions',
-      body: `\`\`\`${yaml.safeDump(msg.member.permissions.serialize())}\`\`\``,
+      body: `\`\`\`yaml\n${yaml.safeDump(msg.member.permissions.serialize())}\n\`\`\``,
     },
     0xbcbcbc,
   );

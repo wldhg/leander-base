@@ -40,17 +40,18 @@ class Point implements LNDRModule {
           total: 0,
           log: [],
         }).value();
-        data.total += change.change;
-        if (data.total < 0) {
+        if (data.total + change.change < 0) {
           throw new Error('point::changePoint - 포인트는 음수가 될 수 없습니다.');
+        } else {
+          data.total += change.change;
+          data.log.push(change);
+          if (data.log.length > 100) {
+            data.log = data.log.slice(Math.max(data.log.length - 100, 0), data.log.length);
+          }
+          db.set(`${memberID}`, data).write().then(() => {
+            resolve(data.total);
+          });
         }
-        data.log.push(change);
-        if (data.log.length > 100) {
-          data.log = data.log.slice(Math.max(data.log.length - 100, 0), data.log.length);
-        }
-        db.set(`${memberID}`, data).write().then(() => {
-          resolve(data.total);
-        });
       })),
 
     getPoint: (guild, member): Promise<PointByUser> => this.getDB(guild)
@@ -66,11 +67,12 @@ class Point implements LNDRModule {
         const all = db.value();
         const users = Object.keys(all);
         const totalsAll = users.map((userID) => all[userID].total);
-        const totalsOrdered = Array.from(new Set(totalsAll)).sort();
-        const rank = totalsOrdered.indexOf(userData.total);
+        const totalsOrdered = Array.from(new Set(totalsAll)).sort((a, b) => b - a);
+        const userTotal = userData ? userData.total : -1;
+        const rank = totalsOrdered.indexOf(userTotal);
         return {
           rank,
-          point: userData.total,
+          point: userTotal,
         };
       }),
 
@@ -79,7 +81,7 @@ class Point implements LNDRModule {
         const all = db.value();
         const users = Object.keys(all);
         const totalsAll = users.map((userID) => all[userID].total);
-        const totalsOrdered = Array.from(new Set(totalsAll)).sort();
+        const totalsOrdered = Array.from(new Set(totalsAll)).sort((a, b) => b - a);
         const ranks = totalsOrdered.map((total) => ({
           point: total,
           users: [],
