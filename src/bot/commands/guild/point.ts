@@ -2,6 +2,7 @@
  * You can obtain a copy of MPL at LICENSE.md of repository root. */
 
 import * as DISCORD from 'discord.js';
+import * as moment from 'moment';
 
 /* eslint-disable no-loop-func, no-else-return */
 
@@ -150,9 +151,20 @@ export const fn: LNDRCommandFunction = (lndr, acts, msg) => {
         );
         embed.addField(`${lndr.dummy}\n현재 포인트`, `\`${pt.total}\` 점!\n${lndr.dummy}`, false);
         if (acts.web) {
-          embed.addField('적립/사용 기록', lndr.t(`${'!!링크 생성 준비중!!'}\n[[res:guild.point.link]]${lndr.dummy}`));
+          embed.addField('적립/사용 기록', lndr.t(`${'!!링크 생성 준비중!!'}\n[[res:guild.point.link]]${lndr.dummy}`), false);
           embed.setFooter(lndr.t(`${lndr.dummy}\n[[res:guild.point.footer_link]]`));
         } else {
+          let logBodyLength = 10;
+          let logBodyContentCount = 0;
+          embed.addField('적립/사용 기록', `\`\`\`md\n${pt.log.reverse().map((log) => {
+            const date = moment(log.time);
+            const body = `[${date.format('YYYY-MM-DD HH:mm')}](${log.change > 0 ? `+${log.change}` : log.change.toString(10)})\n>  ${log.reason}`;
+            if ((logBodyLength + body.length + 1) < 1000) {
+              logBodyLength += body.length + 1;
+              logBodyContentCount += 1;
+            }
+            return body;
+          }).slice(0, Math.min(10, logBodyContentCount)).join('\n')}\`\`\`${lndr.dummy}`);
           embed.setFooter(lndr.t('[[res:guild.point.footer_contact]]'));
         }
         embed.setColor(0x187bcd);

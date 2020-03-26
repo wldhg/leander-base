@@ -10,7 +10,7 @@ const exitHandlers = [];
 const quit = (exitCode?: number): void => {
   if (!exitStarted) {
     exitStarted = true;
-    setTimeout(() => process.exit(exitCode), 0);
+    global.setTimeout(() => process.exit(exitCode), 0);
   }
 };
 
@@ -36,13 +36,13 @@ export const code = (exitCode): Promise<any> => {
   const all = Promise.all(exitHandled);
 
   // Burn the bridges
-  const bridgeTimeout = setTimeout(() => {
+  const bridgeTimeout = global.setTimeout(() => {
     log.warn('모든 종료 핸들러가 처리되지 않았습니다.');
     quit(exitCode);
   }, 20000);
 
   return all.then(() => {
-    clearTimeout(bridgeTimeout);
+    global.clearTimeout(bridgeTimeout);
     quit(exitCode);
   });
 };

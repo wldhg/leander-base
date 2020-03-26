@@ -105,10 +105,10 @@ class Tools implements LNDRModule {
       return `<@!${user.id}>`;
     },
 
-    wa: (str: string): string => this.krBatchimTest(str, '와', '과'),
-    i: (str: string): string => this.krBatchimTest(str, '이', '가'),
-    eun: (str: string): string => this.krBatchimTest(str, '은', '는'),
-    eul: (str: string): string => this.krBatchimTest(str, '을', '를'),
+    wa: (str: string): string => this.lndr.tBatchim(str, '와', '과'),
+    i: (str: string): string => this.lndr.tBatchim(str, '가', '이'),
+    eun: (str: string): string => this.lndr.tBatchim(str, '는', '은'),
+    eul: (str: string): string => this.lndr.tBatchim(str, '를', '을'),
   };
 
   public init = (core: AppCore, lndr: LNDRBase): Promise<void> => new Promise((resolve) => {
@@ -120,26 +120,6 @@ class Tools implements LNDRModule {
   private core: AppCore;
 
   private lndr: LNDRBase;
-
-  private krBatchimTest = (str: string, app1: string, app2: string): string => {
-    let waStr = `${str}${app2}`;
-    if (str.length > 0) {
-      const testStr = str.replace(/[^a-zA-Z가-힣]/gi, '');
-      const lastChar = testStr.charCodeAt(testStr.length - 1);
-      if (
-        lastChar === 0x0041 || lastChar === 0x0061
-        || lastChar === 0x0045 || lastChar === 0x0065
-        || lastChar === 0x0049 || lastChar === 0x0069
-        || lastChar === 0x004f || lastChar === 0x006f
-        || lastChar === 0x0055 || lastChar === 0x0075
-      ) {
-        waStr = `${str}${app1}`;
-      } else if (((lastChar - 0xac00) % 28) === 0) {
-        waStr = `${str}${app1}`;
-      }
-    }
-    return waStr;
-  }
 
   private UNKNOWN_MEMBER = '(없는 멤버)';
 }

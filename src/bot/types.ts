@@ -20,6 +20,7 @@ type LNDRBase = {
   dummy: '\u200B';
   t: LNDRTranslateFunction;
   tDict: object;
+  tBatchim: (str: string, wob: string, wb: string) => string;
   fn: {
     [key: string]: LNDRCommandFunction;
   };

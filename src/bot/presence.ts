@@ -74,8 +74,8 @@ export const off = (core: AppCore, lndr: LNDRBase): Promise<DISCORD.Presence | n
   let prom = Promise.resolve(null);
   if (lndr.cli && lndr.cli.user) {
     // Clear presence changements first
-    clearInterval(msgChangeIntervalNo);
-    clearTimeout(idleTimeoutNo);
+    global.clearInterval(msgChangeIntervalNo);
+    global.clearTimeout(idleTimeoutNo);
 
     // Set offline
     status = 'invisible';
@@ -90,7 +90,7 @@ export const idle = (core: AppCore, lndr: LNDRBase): Promise<DISCORD.Presence | 
   const msgUpdate = status !== 'idle';
   let prom = Promise.resolve(null);
   if (msgUpdate) {
-    clearTimeout(msgChangeIntervalNo);
+    global.clearTimeout(msgChangeIntervalNo);
   }
   if (lndr.cli && lndr.cli.user) {
     prom = lndr.cli.user.setStatus('idle');
@@ -100,7 +100,7 @@ export const idle = (core: AppCore, lndr: LNDRBase): Promise<DISCORD.Presence | 
     if (msgUpdate) {
       recentPresenceIndex = -1;
       changePresence(restPresenceList)();
-      msgChangeIntervalNo = setInterval(
+      msgChangeIntervalNo = global.setInterval(
         changePresence(restPresenceList),
         lndr.config.presence.rest.interval * 1000,
       );
@@ -120,22 +120,22 @@ export const on = (core: AppCore, lndr: LNDRBase): Promise<DISCORD.Presence | nu
 
 export const ping = (core: AppCore, lndr: LNDRBase): void => {
   const msgUpdate = status !== 'online';
-  clearTimeout(idleTimeoutNo);
+  global.clearTimeout(idleTimeoutNo);
   if (msgUpdate) {
-    clearTimeout(msgChangeIntervalNo);
+    global.clearTimeout(msgChangeIntervalNo);
   }
   on(core, lndr).then(() => {
     if (msgUpdate) {
       recentPresenceIndex = -1;
       changePresence(activePresenceList)();
-      msgChangeIntervalNo = setInterval(
+      msgChangeIntervalNo = global.setInterval(
         changePresence(activePresenceList),
         lndr.config.presence.active.interval * 1000,
       );
     }
   });
   if (lndr.config.presence.timeout > 0) {
-    idleTimeoutNo = setTimeout(() => {
+    idleTimeoutNo = global.setTimeout(() => {
       idle(core, lndr);
     }, 1000 * lndr.config.presence.timeout);
   }
@@ -167,7 +167,7 @@ export const init = (core: AppCore, lndr: LNDRBase): Promise<void> => new Promis
   }
 
   cli = lndr.cli;
-  setTimeout(() => {
+  global.setTimeout(() => {
     ping(core, lndr);
     resolve();
   }, 1000);

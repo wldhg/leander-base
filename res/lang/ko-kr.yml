@@ -2,9 +2,11 @@
 bot:
   help:
     h1: '[[bot:emoji]]  명령어 목록'
-    h2: '[[bot:nameForceI]]에게 아래의 명령어를 사용할 수 있어요.'
+    h2: '[[bot:name]]에게 아래의 명령어를 사용할 수 있어요.'
     footer: '`[[bot:prefix]]도움말 [명령어]`를 입력해서 각 명령어에 대한 도움말을 보실 수 있어요.'
-    message: '[[bot:addressing]]님, 가끔은 제게 의지하셔도 괜찮다구요?'
+    message:
+      - '[[bot:addressing]]님, 가끔은 제게 의지하셔도 괜찮다구요?'
+      - '[[bot:addressing]]님, 도움이 되었나요?'
 
 # From Bot Module
 module:
@@ -26,8 +28,14 @@ system:
     info: '저는 [[bot:name]] `[[0]]` 판이에요.'
   ping:
     help: '서버 통신 지연 시간을 말해드려요.'
-    bad: '잘 안 들려요.'
-    good: '아주 잘 들려요.'
+    bad:
+      - '잘 안 들려요.'
+      - '통신 선로에 구름이 낀 것 같아요.'
+      - '원래 이렇게 잘 안들리는 위치가 아닌데...'
+    good:
+      - '아주 잘 들려요.'
+      - '아, 들려요! [[bot:addressing]]님이 보낸 핑 소리!'
+      - '네! 잘 들려요, [[bot:addressing]]님!'
     message: '현재 평균 지연 시간은 **[[0]]ms** 에요.'
   help:
     help: '각종 명령어에 대한 도움말을 보여드려요.\n`[[bot:prefix]]도움말`을 입력하면 전체 명령어 목록을 볼 수 있어요.'
@@ -43,10 +51,10 @@ system:
     need_guildAdmin: '디스코드 서버 관리자 권한이 필요해요.'
     need_lndrAdmin: '[[bot:name]] 관리자 권한이 필요해요.'
   invite:
-    help: '저를 다른 서버로 초대할 수 있는 링크를 알려드릴게요.'
+    help: '[[bot:nameEulReul]] 다른 서버로 초대할 수 있는 링크를 알려드릴게요.'
     h1: '[[bot:emoji]]  두근거려요!'
     h2: '[[bot:addressing]]님 덕분에 더욱 많은 다른 [[bot:addressing]]님을 만나게 되어서 기뻐요.'
-    h3: '초대 링크에서 저를 [[bot:addressing]]님의 다른 서버에 추가해주세요.'
+    h3: '초대 링크에서 [[bot:nameEulReul]] [[bot:addressing]]님의 다른 서버에 추가해주세요.'
     denied: '저는 다른 서버에 초대받을 수 없도록 설정되어 있어요.\n더욱 자세한 정보는 [[0]] [[bot:addressing]]님께 여쭈어 보아 주세요.'
   log:
     success: '[[bot:addressing]]님, 보내신 메시지가 `[[0]]` 번 로그에 저장되었어요.'
@@ -56,6 +64,28 @@ system:
     info: '현재 리엔더 `v[[0]]`는 총 [[1]]개의 패키지에 의존하여 실행되고 있으며 [[2]]개의 패키지에 의존하여 개발되고 있어요.'
 
 guild:
+  att:
+    help: '출석 체크 현황을 보여드리고 관리도 해요. `[[bot:prefix]]출석` 이라고 쳐 보세요.'
+    first_title: '[[bot:addressing]]님의 첫 출석도장! [[bot:nameIGa]] 잘 기록했어요.'
+    first_point: '첫 출석 체크 보너스를 적용했어요! [[0]] 포인트가 적립되었어요.'
+    done_title: '출석 체크!'
+    done_point: '오늘은 아까 이미 출석하셨어요. 다음 출석 시간은 [[0]]에요.'
+    accept_title:
+      - '어서오세요! 오늘의 출석을 기록했어요.'
+      - '오늘도 와주셔서 고마워요.'
+      - '반가워요~'
+      - '행복한 하루 되세요!'
+      - '뾰로롱! [[bot:name]]이 [[bot:addressing]]님의 하루가 행복해지는 마법을 걸었어요.'
+    accept_title_first:
+      - 'WA! 오늘의 첫 출석이에요! 반가워요, [[bot:addressing]]님!'
+      - '짜잔~ 오늘의 1등은 [[bot:addressing]]님!'
+      - '[[bot:addressing]] No. 1! 어서오세요!'
+    accept_point:
+      - '출석 체크가 완료되었습니다. [[0]] 포인트가 적립되었어요.'
+      - '출석을 체크하고 [[0]] 포인트를 적립했어요.'
+      - '[[0]] 포인트 적립이에요, [[bot:addressing]]님!'
+    regular: '[[0]]일'
+    detail_contact: '더 자세한 기록은 저를 관리해주시는 [[bot:addressing]]님께 물어봐주세요.'
   point:
     help: '이 디스코드 서버에서 [[bot:addressing]]님의 포인트를 보여드려요.'
     see_mine: '`[[bot:prefix]]포인트`를 입력하면 [[bot:addressing]]님의 포인트를 볼 수 있어요.'
@@ -71,7 +101,7 @@ guild:
     change_finished_partial: '포인트를 변경할 수 있는 나머지 [[bot:addressing]]님들의 [[0]] 내역을 모두 처리했어요!'
     change_finished_failed: '[[0]] 내용을 처리할 수 있는 [[bot:addressing]]님이 없었어요. 모든 포인트 내역은 그대로에요.'
     footer_link: '위 링크는 보안을 위해 1시간 뒤부터는 볼 수 없어요.'
-    footer_contact: '적립 및 사용 기록은 저의 관리를 담당하시는 [[bot:addressing]]님께 물어봐주세요.'
+    footer_contact: '더 자세한 기록은 저의 관리를 담당하시는 [[bot:addressing]]님께 물어봐주세요.'
     link: '위 링크에서 확인하실 수 있어요.'
     invalid_member: '[[0]] [[bot:addressing]]님은 올바른 멤버 또는 역할이 아닌 것 같아요.'
     query_only_one: '한 번에 한 분씩만 조회할 수 있어요.'
@@ -80,7 +110,9 @@ guild:
     not_zero: '0 포인트로 어쩌라는 건가요? 쓸데없이 저장 공간을 낭비하지 말아주세요.'
   rank:
     help: '이 디스코드 서버에서의 포인트 랭킹을 알려드려요.'
-    greeting: '[[0]] 함께해주셔서 항상 감사해요. ♥'
+    greeting:
+      - '[[0]] 함께해주셔서 항상 감사해요.'
+      - '[[bot:addressing]]님은 몇 등일까요...'
     my_known: '[[0]] [[bot:addressing]]님은 `[[1]]` 포인트로 현재 `[[2]]`위에요.'
     my_unknown: '[[0]] [[bot:addressing]]님은 한 번도 포인트가 적립된 적이 없어서 순위 기록이 없어요.'
     disp_limit: '전체 순위는 [[0]]위까지 표시하고 있어요.'

@@ -69,6 +69,7 @@ export const wakeUp = (core: AppCore, lndrConf: LNDRConfig): void => {
     dummy: '\u200B',
     t: translate.getT(core, lndrConf),
     tDict: translate.botDict,
+    tBatchim: translate.krBatchimTest,
     fn: {},
     help: {},
     meta: {},

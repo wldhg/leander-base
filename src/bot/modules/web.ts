@@ -53,7 +53,7 @@ class Web implements LNDRModule {
       this.routingTable[code] = html;
 
       // Set timeout
-      this.timingTable[code] = setTimeout(() => {
+      this.timingTable[code] = global.setTimeout(() => {
         this.erasePage(code);
       }, time);
 
@@ -230,7 +230,7 @@ class Web implements LNDRModule {
   private notFoundTemplate: string;
 
   private erasePage = (code): void => {
-    clearTimeout(this.timingTable[code]);
+    global.clearTimeout(this.timingTable[code]);
     delete this.timingTable[code];
     delete this.routingTable[code];
   };

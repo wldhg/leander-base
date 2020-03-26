@@ -6,10 +6,20 @@
 /* eslint-disable no-else-return */
 
 type FormatDictObject = {
-  [key: string]: string;
+  [key: string]: string | string[];
 }
 type FormatDictArray = string[];
 type FormatDict = FormatDictObject | FormatDictArray;
+
+const selectRandom = (stra: string|string[]): string => {
+  let ret = 'ERROR';
+  if (stra instanceof Array) {
+    ret = stra[Math.floor(Math.random() * stra.length)];
+  } else {
+    ret = stra;
+  }
+  return ret;
+};
 
 /**
  * Formatter utility.
@@ -24,7 +34,7 @@ const format = (message: string, dict: FormatDict, depth = 0): string => {
       if (replaces[i] === '[[]]') {
         replacedMessage = replacedMessage.replace(
           replaces[i],
-          dict[replacedCounter],
+          selectRandom(dict[replacedCounter]),
         );
         replacedCounter += 1;
       } else {
@@ -35,7 +45,7 @@ const format = (message: string, dict: FormatDict, depth = 0): string => {
         if (typeof dict[reqArg] !== 'undefined') {
           replacedMessage = replacedMessage.replace(
             replaces[i],
-            dict[reqArg],
+            selectRandom(dict[reqArg]),
           );
         }
       }

@@ -106,7 +106,7 @@ class Dialog implements LNDRModule {
   };
 
   private startConversationTimeout = (msg, timeout, cid,
-    timeoutCallback): NodeJS.Timeout => setTimeout(
+    timeoutCallback): NodeJS.Timeout => global.setTimeout(
     () => {
       msg.channel.send(this.lndr.t('[[res:module.dialog.close]]', this.tools.mention(msg.author), String(timeout)));
       delete this.contextInUse[cid];
@@ -120,7 +120,7 @@ class Dialog implements LNDRModule {
     context = this.contextInUse[this.getContextID(msg)]): void => {
     if (msg instanceof DISCORD.Message) {
       // Clear original timeout
-      clearTimeout(context.timeoutID);
+      global.clearTimeout(context.timeoutID);
 
       // Start answering
       try {
