@@ -117,7 +117,7 @@ interface LNDRModuleDep {
   [key: string]: LNDRModule;
 }
 
-type LNDRCommandSection = '커뮤니티' | '기타';
+type LNDRCommandSection = '장난거리' | '커뮤니티' | '기타';
 
 interface LNDRCommandMeta {
   section: LNDRCommandSection | null;

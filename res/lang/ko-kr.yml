@@ -117,3 +117,9 @@ guild:
     my_unknown: '[[0]] [[bot:addressing]]님은 한 번도 포인트가 적립된 적이 없어서 순위 기록이 없어요.'
     disp_limit: '전체 순위는 [[0]]위까지 표시하고 있어요.'
     no_record: '이 서버에는 포인트가 있는 [[bot:addressing]]님이 없어요.'
+
+fun:
+  avatar:
+    help: '사용자 프로필 사진을 크게 보여드려요. `[[bot:prefix]]프사 @멤버/ID`라고 해 보세요.'
+    failed: '해당 사용자를 찾을 수 없었어요.'
+    no_file: '해당 사용자의 프로필 사진을 찾을 수 없었어요.'

@@ -87,7 +87,9 @@ class Tools implements LNDRModule {
       }
     },
 
-    mention: (obj): string => {
+    mention: (obj): string => `<@!${this.acts.getID(obj)}>`,
+
+    getID: (obj): string => {
       let user;
       if (obj instanceof DISCORD.User) {
         user = obj;
@@ -96,13 +98,20 @@ class Tools implements LNDRModule {
       } else if (obj && obj.user && obj.user instanceof DISCORD.User) {
         user = obj.user;
       } else if (typeof obj === 'string') {
-        user = { id: obj };
+        if (
+          (obj.indexOf('<@!') === 0 || obj.indexOf('<@&') === 0)
+          && obj.lastIndexOf('>') === (obj.length - 1)
+        ) {
+          user = { id: obj.substring(3, obj.length - 1) };
+        } else {
+          user = { id: obj };
+        }
       } else {
-        this.core.log.warn('tools::mention - 알 수 없는 객체입니다.');
+        this.core.log.warn('tools::getID - 알 수 없는 객체입니다.');
         this.core.log.debug(obj);
         return '';
       }
-      return `<@!${user.id}>`;
+      return user.id;
     },
 
     wa: (str: string): string => this.lndr.tBatchim(str, '와', '과'),

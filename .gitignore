@@ -70,6 +70,8 @@ src/bot/modules/**/*
 
 # Published commands
 src/bot/commands/**/*
+!src/bot/commands/fun
+!src/bot/commands/fun/*.ts
 !src/bot/commands/guild
 !src/bot/commands/guild/*.ts
 !src/bot/commands/system
